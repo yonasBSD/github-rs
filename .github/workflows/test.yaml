@@ -25,7 +25,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: llvm-tools-preview
-      
+
       - name: Cache dependencies
         uses: actions/cache@v4
         env:
@@ -46,6 +46,8 @@ jobs:
           tool: grcov,cargo-llvm-cov
 
       - name: Generate test result and coverage report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cargo clean
           cargo install cargo2junit
