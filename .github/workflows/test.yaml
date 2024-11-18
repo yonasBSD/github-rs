@@ -6,6 +6,8 @@ on:
 
 name: Test with Code Coverage
 
+permissions: read-all
+
 env:
   CARGO_TERM_COLOR: always
 
