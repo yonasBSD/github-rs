@@ -41,6 +41,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Run cargo test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: cargo test --all-features
 
   coverage:
@@ -70,6 +72,8 @@ jobs:
 
       - name: Run xtask coverage
         uses: actions-rs/cargo@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           command: xtask
           args: coverage
