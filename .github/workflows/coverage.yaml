@@ -17,9 +17,7 @@ jobs:
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
-          override: true
 
       - uses: Swatinem/rust-cache@v2
 
@@ -42,9 +40,7 @@ jobs:
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
           toolchain: ${{ matrix.rust }}
-          override: true
 
       - uses: Swatinem/rust-cache@v2
 
@@ -68,7 +64,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
-          override: true
           components: llvm-tools-preview
 
       - uses: Swatinem/rust-cache@v2
