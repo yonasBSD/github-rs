@@ -48,6 +48,8 @@ jobs:
       - name: Generate test result and coverage report
         run: |
           cargo clean
+          cargo install cargo2junit
+          cargo test $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
           cargo llvm-cov --all-features --workspace --codecov --output-path ./codecov.json
 
       - name: Upload test results
