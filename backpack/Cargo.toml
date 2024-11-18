@@ -1,16 +1,16 @@
 [package]
-name = "test2"
+name = "github-rs"
 version = "0.1.0"
-authors = ["test@example.com"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+octocrab = { version = "*", git = "https://github.com/yonasBSD/octocrab", branch = "yonasBSD" }
+tokio = { version = "*", features = ["full", "macros"] }
+clap = { version = "*", features = ["derive"] }
 
 [[bin]]
-name = "test2"
+name = "github-rs"
 path = "src/main.rs"
 
 [features]
 coverage = []
-
-[dependencies]
