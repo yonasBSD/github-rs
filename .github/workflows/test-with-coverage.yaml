@@ -47,6 +47,12 @@ jobs:
         with:
           tool: grcov,cargo-llvm-cov
 
+      - name: Run tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cargo test --all-features
+
       - name: Generate test result and coverage report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
