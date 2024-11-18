@@ -1,0 +1,3 @@
+[workspace]
+members = ["backpack", "xtask"]
+resolver = "2"
