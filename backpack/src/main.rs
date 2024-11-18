@@ -1,5 +1,6 @@
 use clap::Parser;
 use octocrab::Octocrab;
+use std::error::Error;
 
 /// List GitHub repos
 #[derive(Parser)]
@@ -10,7 +11,7 @@ struct Cli {
 }
 
 #[tokio::main]
-async fn main() -> octocrab::Result<()> {
+async fn main() -> Result<(), Box<dyn Error>> {
     // Parse the command-line arguments
     let cli = Cli::parse();
 
@@ -22,7 +23,7 @@ async fn main() -> octocrab::Result<()> {
         Some(org) => {
             octocrab
                 .current()
-                .list_repos_for_authenticated_user(Some(String::from(org)))
+                .list_repos_for_authenticated_user(Some(org))
                 .type_("owner")
                 .sort("updated")
                 .per_page(100)
