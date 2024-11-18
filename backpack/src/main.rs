@@ -1,12 +1,12 @@
-use octocrab::Octocrab;
 use clap::Parser;
+use octocrab::Octocrab;
 
 /// List GitHub repos
 #[derive(Parser)]
 struct Cli {
     /// The organization
     #[arg(index = 1)]
-    org: Option<String>,  // Optional positional argument
+    org: Option<String>, // Optional positional argument
 }
 
 #[tokio::main]
@@ -28,7 +28,7 @@ async fn main() -> octocrab::Result<()> {
                 .per_page(100)
                 .send()
                 .await?
-        },
+        }
         None => {
             octocrab
                 .current()
@@ -44,7 +44,11 @@ async fn main() -> octocrab::Result<()> {
     let results = octocrab.all_pages(page).await.unwrap();
 
     for repo in results {
-        println!("{}, {}", repo.full_name.unwrap(), repo.default_branch.unwrap());
+        println!(
+            "{}, {}",
+            repo.full_name.unwrap(),
+            repo.default_branch.unwrap()
+        );
     }
 
     Ok(())
