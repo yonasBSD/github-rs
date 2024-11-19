@@ -12,40 +12,40 @@ jobs:
   release:
     name: Release Packaging
     env:
-      PROJECT_NAME_UNDERSCORE: test2
+      PROJECT_NAME_UNDERSCORE: github-rs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
 
       - name: Release Build
         run: cargo build --release
+
+      - name: Set env
+        run: echo "NFPM_VERSION=$(curl -sL https://api.github.com/repos/goreleaser/nfpm/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
 
       - name: Create Packages
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-           git clone --depth 1 https://github.com/goreleaser/nfpm
-           cd nfpm
-           go build -v ./cmd/nfpm
-           cd ..
+           wget https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_amd64.deb
+           sudo dpkg -i nfpm_${NFPM_VERSION}_amd64.deb
+           rm nfpm_${NFPM_VERSION}_amd64.deb
            sed -i -E "s/^version:.+$/version: $VERSION/g" nfpm.yaml
            mkdir scripts
            touch foo bar scripts/postremove.sh scripts/preremove.sh scripts/preinstall.sh scripts/postinstall.sh changelog.yaml foobar.conf
            for pkg in deb apk archlinux rpm ipk; do
-              ./nfpm/nfpm package -p $pkg
+              nfpm package -p $pkg
            done
+           mv target/release/${{ env.PROJECT_NAME_UNDERSCORE }} ${{ env.PROJECT_NAME_UNDERSCORE }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
+        id: artifact-upload-step
         with:
           name: ${{ env.PROJECT_NAME_UNDERSCORE }}
           path: |
-            target/release/${{ env.PROJECT_NAME_UNDERSCORE }}
+            ${{ env.PROJECT_NAME_UNDERSCORE }}
             *.deb
             *.apk
             *.ipk
@@ -53,11 +53,24 @@ jobs:
             *.zst
 
       - name: Create Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          gh release create "$tag" \
-              --repo="$GITHUB_REPOSITORY" \
-              --title="${tag#v}" \
-              --generate-notes
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.PROJECT_NAME_UNDERSCORE }}
+            *.deb
+            *.apk
+            *.ipk
+            *.rpm
+            *.zst
+
+    #- name: Output artifact ID
+    #  run:  echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
+      
+    #  - name: Create Release
+    #    env:
+    #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #      tag: ${{ github.ref_name }}
+    #       gh release create "$tag" \
+    #         --repo="$GITHUB_REPOSITORY" \
+    #         --title="${tag#v}" \
+    #         --generate-notes
