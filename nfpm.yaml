@@ -2,45 +2,22 @@
 #
 # check https://nfpm.goreleaser.com/configuration for detailed usage
 #
-name: "foo"
+name: "github-rs"
 arch: "amd64"
 platform: "linux"
 version: "1.0.0"
 section: "default"
 priority: "extra"
-replaces:
-- foobar
-provides:
-- bar
-depends:
-- foo
-- bar
-recommends:
-- whatever
-suggests:
-- something-else
-conflicts:
-- not-foo
-- not-bar
 maintainer: "John Doe <john@example.com>"
 description: |
-  FooBar is the great foo and bar software.
-    And this can be in multiple lines!
-vendor: "FooBarCorp"
-homepage: "http://example.com"
+  CLI to the GitHub API.
+vendor: "FooBar Corp"
+homepage: "http://github.com/yonasBSD/github-rs"
 license: "MIT"
 changelog: "changelog.yaml"
 contents:
-- src: ./foo
-  dst: /usr/bin/foo
-- src: ./bar
-  dst: /usr/bin/bar
-- src: ./foobar.conf
-  dst: /etc/foobar.conf
-  type: config
-- src: /usr/bin/foo
-  dst: /sbin/foo
-  type: symlink
+- src: ./target/release/github-rs
+  dst: /usr/bin/github-rs
 overrides:
   rpm:
     scripts:
