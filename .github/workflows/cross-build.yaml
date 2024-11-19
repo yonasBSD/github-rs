@@ -11,6 +11,12 @@ on:
 
 name: Cross Build
 
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+
 jobs:
   test:
     name: Test Platforms
