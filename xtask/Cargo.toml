@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 
-clap = "3"
+clap = "4"
 anyhow = "1"
 xshell = "^0.2.2"
 duct = "0.13.5"
