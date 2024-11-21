@@ -9,6 +9,8 @@ tokio = { version = "*", features = ["full", "macros"] }
 clap = { version = "*", features = ["derive"] }
 colored = "2.1.0"
 which = "7.0.0"
+config = "0.14.1"
+xdg = "2.5.2"
 
 [[bin]]
 name = "github-rs"

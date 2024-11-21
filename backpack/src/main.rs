@@ -1,8 +1,12 @@
 use clap::Parser;
 use colored::Colorize;
 use which::which;
-use github_rs::*;
+use config::Config;
+use xdg;
+use std::collections::HashMap;
 use std::{io::Write, error::Error, process::Command};
+
+use github_rs::*;
 
 /// List GitHub repos
 #[derive(Parser)]
@@ -14,6 +18,10 @@ struct Cli {
     /// Sync with upstream
     #[arg(short = 's', long = "sync", default_value_t=false)]
     sync: bool,
+
+    /// GitHub token
+    #[arg(short = 't', long = "token")]
+    token: Option<String>,
 }
 
 #[tokio::main]
@@ -21,7 +29,37 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Parse the command-line arguments
     let cli = Cli::parse();
 
-    let token = std::env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN env variable is required");
+    let mut token: String = match cli.token {
+        Some(t) => t,
+        None => String::from(""),
+    };
+
+    if token.is_empty() {
+        let config_path = xdg::BaseDirectories::with_prefix("").unwrap().get_config_home();
+        match Config::builder()
+            // Add in `./config/github-rs/config.toml`
+            .add_source(config::File::with_name(format!("{}/{}", config_path.display(), "github-rs/config").as_str()))
+            // Add in settings from the environment (with a prefix of APP)
+            // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
+            .add_source(config::Environment::with_prefix("GITHUB"))
+            .build() {
+            Ok(settings) => {
+                // Read config file
+                let app = settings.try_deserialize::<HashMap<String, String>>().unwrap();
+                if app.contains_key("token") {
+                    token = app["token"].clone();
+                } else {
+                    println!("{}", "Error: Could not find GitHub token".red());
+                    std::process::exit(1);
+                }
+            }
+            Err(_) => {
+                //token = std::env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN env variable is required");
+                println!("{}", "Error: Could not find GitHub token".red());
+                std::process::exit(1);
+            }
+        };
+    }
 
     // Get the value of the positional argument (if provided)
     let results = match cli.org {
