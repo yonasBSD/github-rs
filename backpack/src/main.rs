@@ -5,6 +5,7 @@ use config::Config;
 use xdg;
 use std::collections::HashMap;
 use std::{io::Write, error::Error, process::Command};
+use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HeaderValue, HeaderMap};
 
 use github_rs::*;
 
@@ -26,6 +27,8 @@ struct Cli {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    env_logger::init();
+
     // Parse the command-line arguments
     let cli = Cli::parse();
 
@@ -63,11 +66,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // Get the value of the positional argument (if provided)
     let results = match cli.org {
-        Some(org) => get_repos(token, Some(org)).await?,
-        None => get_repos(token, None).await?,
+        Some(org) => get_repos(token.clone(), Some(org)).await?,
+        None => get_repos(token.clone(), None).await?,
     };
 
     let mut count = 0;
+    let mut headers = HeaderMap::new();
+    headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
+    headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+    headers.insert(ACCEPT, HeaderValue::from_static("application/vnd.github.v3+json"));
+    headers.insert(AUTHORIZATION, HeaderValue::from_str(&format!("token {}", token.clone())).unwrap());
+
     for repo in results {
         if cli.sync {
             let cmd = which("gh");
@@ -82,20 +91,31 @@ async fn main() -> Result<(), Box<dyn Error>> {
             count += 1;
             println!("=========== Updating {} ===========\n", &repo.full_name.clone().unwrap());
 
-            let output = Command::new("gh")
-                .arg("repo")
-                .arg("sync")
-                .arg(repo.full_name.unwrap())
-                .output()
-                .expect("failed to execute gh");
+            let mut branch = HashMap::new();
+            branch.insert("branch", repo.default_branch.unwrap());
 
-            std::io::stdout().write_all(&output.stdout).unwrap();
-            std::io::stderr().write_all(&output.stderr).unwrap();
+            let url = format!("https://api.github.com/repos/{}/merge-upstream", repo.full_name.unwrap());
+            let client = reqwest::Client::builder()
+                .connection_verbose(true)
+                .build()
+                .expect("Client::new()");
+            let resp: HashMap<String, String> = client.post(url)
+                .headers(headers.clone())
+                .json(&branch)
+                .send()
+                .await?
+                .json::<HashMap<String, String>>()
+                .await?;
 
-            if output.status.success() {
-                println!("{} Syned.\n\n", "✓".green());
+            if resp.contains_key("message") {
+                if resp["message"].contains("This branch is not behind the upstream") {
+                    println!("{} Synced.\n\n", "✓".green());
+                } else {
+                    let msg = &resp["message"];
+                    println!("{}", format!("==> ERROR: {}\n\n", msg.red()));
+                }
             } else {
-                println!("==> ERROR: Merge conflicts\n\n");
+                println!("==> ERROR: {:?}", resp);
             }
         } else {
             println!(
