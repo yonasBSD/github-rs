@@ -1,11 +1,11 @@
 use clap::Parser;
 use colored::Colorize;
-use which::which;
 use config::Config;
-use xdg;
+use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use std::collections::HashMap;
-use std::{io::Write, error::Error, process::Command};
-use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HeaderValue, HeaderMap};
+use std::error::Error;
+use which::which;
+use xdg;
 
 use github_rs::*;
 
@@ -17,7 +17,7 @@ struct Cli {
     org: Option<String>, // Optional positional argument
 
     /// Sync with upstream
-    #[arg(short = 's', long = "sync", default_value_t=false)]
+    #[arg(short = 's', long = "sync", default_value_t = false)]
     sync: bool,
 
     /// GitHub token
@@ -38,17 +38,24 @@ async fn main() -> Result<(), Box<dyn Error>> {
     };
 
     if token.is_empty() {
-        let config_path = xdg::BaseDirectories::with_prefix("").unwrap().get_config_home();
+        let config_path = xdg::BaseDirectories::with_prefix("")
+            .unwrap()
+            .get_config_home();
         match Config::builder()
             // Add in `./config/github-rs/config.toml`
-            .add_source(config::File::with_name(format!("{}/{}", config_path.display(), "github-rs/config").as_str()))
+            .add_source(config::File::with_name(
+                format!("{}/{}", config_path.display(), "github-rs/config").as_str(),
+            ))
             // Add in settings from the environment (with a prefix of APP)
             // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
             .add_source(config::Environment::with_prefix("GITHUB"))
-            .build() {
+            .build()
+        {
             Ok(settings) => {
                 // Read config file
-                let app = settings.try_deserialize::<HashMap<String, String>>().unwrap();
+                let app = settings
+                    .try_deserialize::<HashMap<String, String>>()
+                    .unwrap();
                 if app.contains_key("token") {
                     token = app["token"].clone();
                 } else {
@@ -74,32 +81,48 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let mut headers = HeaderMap::new();
     headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
     headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-    headers.insert(ACCEPT, HeaderValue::from_static("application/vnd.github.v3+json"));
-    headers.insert(AUTHORIZATION, HeaderValue::from_str(&format!("token {}", token.clone())).unwrap());
+    headers.insert(
+        ACCEPT,
+        HeaderValue::from_static("application/vnd.github.v3+json"),
+    );
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("token {}", token.clone())).unwrap(),
+    );
 
     for repo in results {
         if cli.sync {
             let cmd = which("gh");
             let _ = match cmd {
-                Ok(_) => { },
+                Ok(_) => {}
                 Err(_) => {
-                    println!("{}", "Error: Could not find GitHub client program `gh`.".red());
+                    println!(
+                        "{}",
+                        "Error: Could not find GitHub client program `gh`.".red()
+                    );
                     std::process::exit(1);
                 }
             };
 
             count += 1;
-            println!("=========== Updating {} ===========\n", &repo.full_name.clone().unwrap());
+            println!(
+                "=========== Updating {} ===========\n",
+                &repo.full_name.clone().unwrap()
+            );
 
             let mut branch = HashMap::new();
             branch.insert("branch", repo.default_branch.unwrap());
 
-            let url = format!("https://api.github.com/repos/{}/merge-upstream", repo.full_name.unwrap());
+            let url = format!(
+                "https://api.github.com/repos/{}/merge-upstream",
+                repo.full_name.unwrap()
+            );
             let client = reqwest::Client::builder()
                 .connection_verbose(true)
                 .build()
                 .expect("Client::new()");
-            let resp: HashMap<String, String> = client.post(url)
+            let resp: HashMap<String, String> = client
+                .post(url)
                 .headers(headers.clone())
                 .json(&branch)
                 .send()
@@ -108,7 +131,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .await?;
 
             if resp.contains_key("message") {
-                if resp["message"].contains("This branch is not behind the upstream") {
+                if resp["message"].contains("This branch is not behind the upstream") || resp["message"].contains("Successfully fetched and fast-forwarded from upstream") {
                     println!("{} Synced.\n\n", "✓".green());
                 } else {
                     let msg = &resp["message"];
