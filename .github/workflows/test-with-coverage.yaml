@@ -7,7 +7,7 @@ on:
 name: Test with Code Coverage
 
 permissions:
-  contents: read
+  contents: write
   issues: read
   checks: write
   pull-requests: write

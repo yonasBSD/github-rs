@@ -7,6 +7,7 @@ pub fn multiply(a: i32, b: i32) -> i32 {
     a * b
 }
 
+/// List GitHub repositories
 pub async fn get_repos(
     token: String,
     org: Option<String>,
