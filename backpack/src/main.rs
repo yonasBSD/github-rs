@@ -131,7 +131,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .await?;
 
             if resp.contains_key("message") {
-                if resp["message"].contains("This branch is not behind the upstream") || resp["message"].contains("Successfully fetched and fast-forwarded from upstream") {
+                if resp["message"].contains("This branch is not behind the upstream")
+                    || resp["message"]
+                        .contains("Successfully fetched and fast-forwarded from upstream")
+                {
                     println!("{} Synced.\n\n", "✓".green());
                 } else {
                     let msg = &resp["message"];
