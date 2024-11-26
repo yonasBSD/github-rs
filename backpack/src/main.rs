@@ -11,6 +11,7 @@ use github_rs::*;
 
 /// List GitHub repos
 #[derive(Parser)]
+#[clap(version)]
 struct Cli {
     /// The organization
     #[arg(index = 1)]
