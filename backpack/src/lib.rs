@@ -14,6 +14,12 @@ pub async fn get_repos(
 ) -> Result<Vec<Repository>, Box<dyn Error>> {
     let octocrab = Octocrab::builder().personal_token(token).build()?;
 
+    // Validate token permissions early. Fail fast if user info is not returned.
+    let user = octocrab.current().user().await?;
+    if user.login.is_empty() {
+        return Err("Invalid or insufficient token permissions".into());
+    }
+
     // Get the value of the positional argument (if provided)
     let page = match org {
         Some(org) => {
