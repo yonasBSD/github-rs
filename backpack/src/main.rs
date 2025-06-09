@@ -40,8 +40,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if token.is_empty() {
         let config_path = xdg::BaseDirectories::with_prefix("")
-            .unwrap()
-            .get_config_home();
+            .get_config_home()
+            .unwrap();
         match Config::builder()
             // Add in `./config/github-rs/config.toml`
             .add_source(config::File::with_name(
