@@ -51,9 +51,18 @@ jobs:
         with:
           tool: grcov,cargo-llvm-cov
 
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          # Set the owner, so the token can be used in all repositories
+          owner: ${{ github.repository_owner }}
+
       - name: Run tests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           cargo test --all-features
 
@@ -62,7 +71,7 @@ jobs:
 
       - name: Generate test result and coverage report
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           wget https://github.com/yonasBSD/cargo2junit/releases/download/v${CARGO2JUNIT_VERSION}/cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           sudo dpkg -i cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
@@ -92,7 +101,7 @@ jobs:
       #    verbose: true
       #    token: ${{ secrets.CODECOV_TOKEN }}
       #    files: ${{ github.workspace }}/codecov.json
- 
+
       #  - name: Upload to codecov.io
       #    uses: codecov/codecov-action@v5
       #    with:
