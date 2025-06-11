@@ -51,12 +51,6 @@ jobs:
         with:
           tool: grcov,cargo-llvm-cov
 
-      - name: Run tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-        run: |
-          cargo test --all-features
-
       - name: Set env
         run: echo "CARGO2JUNIT_VERSION=$(curl -sL https://api.github.com/repos/yonasBSD/cargo2junit/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
 
@@ -68,7 +62,7 @@ jobs:
           sudo dpkg -i cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           rm cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           cargo clean
-          cargo test $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
+          cargo test --all-features $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
           cargo llvm-cov --all-features --workspace --codecov --output-path ./codecov.json
 
       - name: Upload test results
