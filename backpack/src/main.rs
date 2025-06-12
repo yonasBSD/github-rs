@@ -5,7 +5,6 @@ use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYP
 use std::collections::HashMap;
 use std::error::Error;
 use which::which;
-use xdg;
 
 use github_rs::*;
 
@@ -33,15 +32,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Parse the command-line arguments
     let cli = Cli::parse();
 
-    let mut token: String = match cli.token {
-        Some(t) => t,
-        None => String::from(""),
-    };
+    let mut token: String = cli.token.unwrap_or_default();
 
     if token.is_empty() {
         let config_path = xdg::BaseDirectories::with_prefix("")
-            .unwrap()
-            .get_config_home();
+            .get_config_home()
+            .unwrap();
         match Config::builder()
             // Add in `./config/github-rs/config.toml`
             .add_source(config::File::with_name(
@@ -94,7 +90,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     for repo in results {
         if cli.sync {
             let cmd = which("gh");
-            let _ = match cmd {
+            match cmd {
                 Ok(_) => {}
                 Err(_) => {
                     println!(
@@ -139,7 +135,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     println!("{} Synced.\n\n", "✓".green());
                 } else {
                     let msg = &resp["message"];
-                    println!("{}", format!("==> ERROR: {}\n\n", msg.red()));
+                    println!("==> ERROR: {}\n\n", msg.red());
                 }
             } else {
                 println!("==> ERROR: {:?}", resp);
