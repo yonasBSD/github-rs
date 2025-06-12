@@ -8,7 +8,7 @@ octocrab = { version = "*", git = "https://github.com/yonasBSD/octocrab", branch
 tokio = { version = "*", features = ["full", "macros"] }
 clap = { version = "*", features = ["derive"] }
 colored = "3.0.0"
-which = "7.0.0"
+which = "8.0.0"
 config = "0.15.4"
 xdg = "3.0.0"
 reqwest = { version = "0.12.9", default-features = false, features = ["blocking", "hickory-dns", "json", "rustls-tls"] }
