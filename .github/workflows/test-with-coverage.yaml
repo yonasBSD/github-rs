@@ -54,6 +54,12 @@ jobs:
       - name: Set env
         run: echo "CARGO2JUNIT_VERSION=$(curl -sL https://api.github.com/repos/yonasBSD/cargo2junit/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
 
+      #- name: Run test
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      #  run: |
+      #    cargo test --all-features
+
       - name: Generate test result and coverage report
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
