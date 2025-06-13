@@ -46,10 +46,10 @@ jobs:
             target
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
 
-      - name: Install grcov
+      - name: Install grcov, cargo-llvm-cov and nextest
         uses: taiki-e/install-action@v2
         with:
-          tool: grcov,cargo-llvm-cov
+          tool: grcov,cargo-llvm-cov,nextest
 
       - name: Set env
         run: echo "CARGO2JUNIT_VERSION=$(curl -sL https://api.github.com/repos/yonasBSD/cargo2junit/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
@@ -57,13 +57,14 @@ jobs:
       - name: Generate test result and coverage report
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          NEXTEST_PROFILE: coverage # defined in .config/nextest.toml
         run: |
           wget https://github.com/yonasBSD/cargo2junit/releases/download/v${CARGO2JUNIT_VERSION}/cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           sudo dpkg -i cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           rm cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           cargo clean
           cargo test --all-features $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
-          cargo llvm-cov --all-features --workspace --codecov --output-path ./codecov.json
+          cargo llvm-cov nextest --all-features --workspace --codecov --output-path ./codecov.json
 
       - name: Upload test results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -80,15 +81,10 @@ jobs:
           command: xtask
           args: coverage
 
-      #- name: Upload Coverage Report
-      #  uses: codecov/codecov-action@v5
-      #  with:
-      #    verbose: true
-      #    token: ${{ secrets.CODECOV_TOKEN }}
-      #    files: ${{ github.workspace }}/codecov.json
-
-      #  - name: Upload to codecov.io
-      #    uses: codecov/codecov-action@v5
-      #    with:
-      #      files: coverage/*.lcov
-      #    fail_ci_if_error: true
+      - name: Upload Coverage Report
+        uses: codecov/codecov-action@v5
+        with:
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ github.workspace }}/codecov.json
+      #   files: coverage/*.lcov
