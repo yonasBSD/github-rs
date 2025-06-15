@@ -1,6 +1,5 @@
 use clap::Parser;
 use colored::Colorize;
-use config::Config;
 use octocrab::models::Repository;
 use octocrab::Octocrab;
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
@@ -69,10 +68,23 @@ pub async fn get_repos(
     Ok(octocrab.all_pages(page).await.unwrap())
 }
 
+#[cfg(target_family = "windows")]
 pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
     if !token.is_empty() {
         return Ok(token);
     }
+
+    let token = std::env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN env variable is required");
+    Ok(token)
+}
+
+#[cfg(target_family = "unix")]
+pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
+    if !token.is_empty() {
+        return Ok(token);
+    }
+
+    use config::Config;
 
     let config_path = xdg::BaseDirectories::with_prefix("")
         .get_config_home()
@@ -255,6 +267,7 @@ mod test {
         Ok(())
     }
 
+    #[cfg(target_family = "unix")]
     #[tokio::test]
     async fn test_get_empty_token() -> Result<(), Box<dyn Error>> {
         // Write config.toml file
