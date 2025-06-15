@@ -45,9 +45,32 @@ jobs:
         with:
           toolchain: stable
           components: clippy
-      
+
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features
           name: Clippy Output
+
+  conventional_commits:
+    name: Check conventional commit compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Conventional commit check
+        uses: cocogitto/cocogitto-action@main
+
+  spellchecking:
+    name: Spell checking and corrections
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Writes changes in the local checkout
+        uses: crate-ci/typos@master
+        with:
+          write_changes: true
