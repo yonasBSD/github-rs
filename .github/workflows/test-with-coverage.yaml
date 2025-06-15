@@ -72,14 +72,7 @@ jobs:
           cargo test --all-features $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
           cargo llvm-cov nextest --all-features --workspace --codecov --output-path ./codecov.json
 
-      - name: Upload test results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          check_name: Test Results
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          files: results.xml
-
-      - name: Run xtask coverage
+      - name: Run xtask coverage (grcov)
         uses: actions-rs/cargo@v1
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
@@ -87,10 +80,26 @@ jobs:
           command: xtask
           args: coverage
 
-      - name: Upload Coverage Report
+      - name: Upload test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          check_name: Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: results.xml
+
+      - name: Upload CodeCov coverage report
         uses: codecov/codecov-action@v5
         with:
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ github.workspace }}/codecov.json
-      #   files: coverage/*.lcov
+
+      - name: Upload Codacy coverage report
+        uses: codacy/codacy-coverage-reporter-action@a38818475bb21847788496e9f0fddaa4e84955ba # v1.3.0
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          # or
+          # api-token: ${{ secrets.CODACY_API_TOKEN }}
+          coverage-reports: coverage/*.lcov
+          # or a comma-separated list for multiple reports
+          # coverage-reports: <PATH_TO_REPORT>, <PATH_TO_REPORT>

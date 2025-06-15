@@ -11,6 +11,7 @@
 
 ![Security Audit](https://github.com/yonasBSD/github-rs/actions/workflows/security.yaml/badge.svg)
 ![Scorecard Audit](https://github.com/yonasBSD/github-rs/actions/workflows/scorecard.yaml/badge.svg)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1545c22f5f484e4ea9bf6ed4c58f0ee4)](https://app.codacy.com/gh/yonasBSD/github-rs/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=yonasBSD_github-rs&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=yonasBSD_github-rs)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=yonasBSD_github-rs&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=yonasBSD_github-rs)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=yonasBSD_github-rs&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=yonasBSD_github-rs)
