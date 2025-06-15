@@ -1,0 +1,7 @@
+---
+scan:
+  scanners:
+   - vuln
+   - secret
+   - misconfig
+exit-code: 183
