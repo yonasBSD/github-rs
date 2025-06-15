@@ -4,6 +4,7 @@
 ![testing workflow](https://github.com/yonasBSD/github-rs/actions/workflows/test-with-coverage.yaml/badge.svg)
 ![packaging](https://github.com/yonasBSD/github-rs/actions/workflows/release-packaging.yaml/badge.svg)
 ![cross-build](https://github.com/yonasBSD/github-rs/actions/workflows/cross-build.yaml/badge.svg)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ec50f73bf75450892d0abf37df71975)](https://app.codacy.com/gh/yonasBSD/github-rs?utm_source=github.com&utm_medium=referral&utm_content=yonasBSD/github-rs&utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/yonasBSD/github-rs/branch/main/graph/badge.svg?token=1R5SBEX51H)](https://codecov.io/gh/yonasBSD/github-rs)
 <!--[![ghcr.io](https://img.shields.io/badge/ghcr.io-download-blue)](https://github.com/yonasBSD/github-rs/pkgs/container/github-rs)-->
 <!--[![Docker Pulls](https://img.shields.io/docker/pulls/github-rs/example.svg)](https://hub.docker.com/r/github-rs/example)-->
