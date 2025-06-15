@@ -1,18 +1,24 @@
 # Rust CI with GitHub Actions
 
-![Linting workflow](https://github.com/yonasBSD/rust-ci-github-actions-workflow/actions/workflows/lint.yaml/badge.svg)
-![testing workflow](https://github.com/yonasBSD/rust-ci-github-actions-workflow/actions/workflows/test-with-coverage.yaml/badge.svg)
-![packaging](https://github.com/yonasBSD/rust-ci-github-actions-workflow/actions/workflows/release-packaging.yaml/badge.svg)
-![cross-build](https://github.com/yonasBSD/rust-ci-github-actions-workflow/actions/workflows/cross-build.yaml/badge.svg)
-<!--[![codecov](https://codecov.io/gh/yonasBSD/rust-ci-github-actions-workflow/branch/main/graph/badge.svg?token=SLIHSUWHT2)](https://codecov.io/gh/yonasBSD/rust-ci-github-actions-workflow)-->
-<!--[![ghcr.io](https://img.shields.io/badge/ghcr.io-download-blue)](https://github.com/yonasBSD/rust-ci-github-actions-workflow/pkgs/container/rust-ci-github-actions-workflow)-->
-<!--[![Docker Pulls](https://img.shields.io/docker/pulls/rust-ci-github-actions-workflow/example.svg)](https://hub.docker.com/r/rust-ci-github-actions-workflow/example)-->
-<!--[![Quay.io](https://img.shields.io/badge/Quay.io-download-blue)](https://quay.io/repository/rust-ci-github-actions-workflow/example)-->
+![Linting workflow](https://github.com/yonasBSD/github-rs/actions/workflows/lint.yaml/badge.svg)
+![testing workflow](https://github.com/yonasBSD/github-rs/actions/workflows/test-with-coverage.yaml/badge.svg)
+![packaging](https://github.com/yonasBSD/github-rs/actions/workflows/release-packaging.yaml/badge.svg)
+![cross-build](https://github.com/yonasBSD/github-rs/actions/workflows/cross-build.yaml/badge.svg)
+[![codecov](https://codecov.io/gh/yonasBSD/github-rs/branch/main/graph/badge.svg?token=1R5SBEX51H)](https://codecov.io/gh/yonasBSD/github-rs)
+<!--[![ghcr.io](https://img.shields.io/badge/ghcr.io-download-blue)](https://github.com/yonasBSD/github-rs/pkgs/container/github-rs)-->
+<!--[![Docker Pulls](https://img.shields.io/docker/pulls/github-rs/example.svg)](https://hub.docker.com/r/github-rs/example)-->
+<!--[![Quay.io](https://img.shields.io/badge/Quay.io-download-blue)](https://quay.io/repository/github-rs/example)-->
 
-![GitHub last commit](https://img.shields.io/github/last-commit/yonasBSD/rust-ci-github-actions-workflow)
-[![Dependency Status](https://deps.rs/repo/github/yonasBSD/rust-ci-github-actions-workflow/status.svg)](https://deps.rs/repo/github/yonasBSD/rust-ci-github-actions-workflow)
-[![GitHub Release](https://img.shields.io/github/release/yonasBSD/rust-ci-github-actions-workflow.svg)](https://github.com/yonasBSD/rust-ci-github-actions-workflow/releases/latest)
-[![License](https://img.shields.io/github/license/yonasBSD/rust-ci-github-actions-workflow.svg)](https://github.com/yonasBSD/rust-ci-github-actions-workflow/blob/main/LICENSE.txt)
+![Security Audit](https://github.com/yonasBSD/github-rs/actions/workflows/security.yaml/badge.svg)
+![Scorecard Audit](https://github.com/yonasBSD/github-rs/actions/workflows/scorecard.yaml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=yonasBSD_github-rs&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=yonasBSD_github-rs)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=yonasBSD_github-rs&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=yonasBSD_github-rs)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=yonasBSD_github-rs&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=yonasBSD_github-rs)
+
+![GitHub last commit](https://img.shields.io/github/last-commit/yonasBSD/github-rs)
+[![Dependency Status](https://deps.rs/repo/github/yonasBSD/github-rs/status.svg)](https://deps.rs/repo/github/yonasBSD/github-rs)
+[![GitHub Release](https://img.shields.io/github/release/yonasBSD/github-rs.svg)](https://github.com/yonasBSD/github-rs/releases/latest)
+[![License](https://img.shields.io/github/license/yonasBSD/github-rs.svg)](https://github.com/yonasBSD/github-rs/blob/main/LICENSE.txt)
 <!--[![Matrix Chat](https://img.shields.io/matrix/vaultwarden:matrix.org.svg?logo=matrix)](https://matrix.to/#/#vaultwarden:matrix.org)-->
 
 
