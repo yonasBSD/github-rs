@@ -73,6 +73,7 @@ jobs:
       - name: Writes changes in the local checkout
         uses: crate-ci/typos@master
         with:
+          files: backpack/**/*.rs
           write_changes: true
 
       - name: Create GitHub code review suggestions
