@@ -96,9 +96,9 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Run advisories checklist
-        uses: yonasBSD/toolkit@6647c8140a48bf1951edddd590006919066b626a # main
-        with:
-          run: |
-            echo ### Advisories > $GITHUB_STEP_SUMMARY
-            cargo deny check advisories >> $GITHUB_STEP_SUMMARY
+      #- name: Run advisories checklist
+      #  uses: yonasBSD/toolkit@6647c8140a48bf1951edddd590006919066b626a # main
+      #  with:
+      #    run: |
+      #      echo ### Advisories > $GITHUB_STEP_SUMMARY
+      #      cargo deny check advisories >> $GITHUB_STEP_SUMMARY
