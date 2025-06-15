@@ -174,7 +174,7 @@ pub async fn update_repos(
                 );
                 std::process::exit(1);
             }
-        };
+        }
 
         count += 1;
         println!(
