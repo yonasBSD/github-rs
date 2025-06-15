@@ -1,7 +1,7 @@
 use clap::Parser;
 use std::error::Error;
 
-use github_rs::*;
+use github_rs::{get_repos, get_token, update_repos, Cli};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
