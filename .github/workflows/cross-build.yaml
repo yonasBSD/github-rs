@@ -39,5 +39,5 @@ jobs:
 
       - name: Run cargo test
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: cargo test --all-features
