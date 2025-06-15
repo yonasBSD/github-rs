@@ -128,6 +128,24 @@ pub fn make_headers(token: String) -> HeaderMap {
     headers
 }
 
+pub async fn make_response(
+    client: reqwest::Client,
+    url: String,
+    headers: HeaderMap,
+    branch: HashMap<&str, String>,
+) -> Result<HashMap<String, String>, Box<dyn Error>> {
+    let map = client
+        .post(url)
+        .headers(headers.clone())
+        .json(&branch)
+        .send()
+        .await?
+        .json::<HashMap<String, String>>()
+        .await?;
+
+    Ok(map)
+}
+
 pub async fn update_repos(
     repos: Vec<Repository>,
     sync: bool,
@@ -136,66 +154,60 @@ pub async fn update_repos(
     let mut count = 0;
 
     for repo in repos {
-        if sync {
-            let cmd = which("gh");
-            match cmd {
-                Ok(_) => {}
-                Err(_) => {
-                    println!(
-                        "{}",
-                        "Error: Could not find GitHub client program `gh`.".red()
-                    );
-                    std::process::exit(1);
-                }
-            };
-
-            count += 1;
-            println!(
-                "=========== Updating {} ===========\n",
-                &repo.full_name.clone().unwrap()
-            );
-
-            let mut branch = HashMap::new();
-            branch.insert("branch", repo.default_branch.unwrap());
-
-            let url = format!(
-                "https://api.github.com/repos/{}/merge-upstream",
-                repo.full_name.unwrap()
-            );
-            let client = reqwest::Client::builder()
-                .connection_verbose(true)
-                .build()
-                .expect("Client::new()");
-
-            let headers = make_headers(token.clone());
-            let resp: HashMap<String, String> = client
-                .post(url)
-                .headers(headers.clone())
-                .json(&branch)
-                .send()
-                .await?
-                .json::<HashMap<String, String>>()
-                .await?;
-
-            if resp.contains_key("message") {
-                if resp["message"].contains("This branch is not behind the upstream")
-                    || resp["message"]
-                        .contains("Successfully fetched and fast-forwarded from upstream")
-                {
-                    println!("{} Synced.\n\n", "✓".green());
-                } else {
-                    let msg = &resp["message"];
-                    println!("==> ERROR: {}\n\n", msg.red());
-                }
-            } else {
-                println!("==> ERROR: {:?}", resp);
-            }
-        } else {
+        if !sync {
             println!(
                 "{}, {}",
                 repo.full_name.unwrap(),
                 repo.default_branch.unwrap()
             );
+
+            continue;
+        }
+
+        let cmd = which("gh");
+        match cmd {
+            Ok(_) => {}
+            Err(_) => {
+                println!(
+                    "{}",
+                    "Error: Could not find GitHub client program `gh`.".red()
+                );
+                std::process::exit(1);
+            }
+        };
+
+        count += 1;
+        println!(
+            "=========== Updating {} ===========\n",
+            &repo.full_name.clone().unwrap()
+        );
+
+        let mut branch = HashMap::new();
+        branch.insert("branch", repo.default_branch.unwrap());
+
+        let url = format!(
+            "https://api.github.com/repos/{}/merge-upstream",
+            repo.full_name.unwrap()
+        );
+        let client = reqwest::Client::builder()
+            .connection_verbose(true)
+            .build()
+            .expect("Client::new()");
+
+        let headers: HeaderMap = make_headers(token.clone());
+        let resp: HashMap<String, String> = make_response(client, url, headers, branch).await?;
+
+        if resp.contains_key("message") {
+            if resp["message"].contains("This branch is not behind the upstream")
+                || resp["message"].contains("Successfully fetched and fast-forwarded from upstream")
+            {
+                println!("{} Synced.\n\n", "✓".green());
+            } else {
+                let msg = &resp["message"];
+                println!("==> ERROR: {}\n\n", msg.red());
+            }
+        } else {
+            println!("==> ERROR: {:?}", resp);
         }
     }
 
