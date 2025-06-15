@@ -1,6 +1,7 @@
 use clap::Parser;
 use colored::Colorize;
 use config::Config;
+use directories::ProjectDirs;
 use octocrab::models::Repository;
 use octocrab::Octocrab;
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
@@ -74,13 +75,13 @@ pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
         return Ok(token);
     }
 
-    let base_path = directories::BaseDirs::new().expect("Get base path");
+    let base_path = ProjectDirs::from("org", "yonasBSD", "github-rs").expect("Get config path");
     let config_path = base_path.config_dir();
 
     let m_token = match Config::builder()
         // Add in `./config/github-rs/config.toml`
         .add_source(config::File::with_name(
-            format!("{}/{}", config_path.display(), "github-rs/config").as_str(),
+            format!("{}/{}", config_path.display(), "/config").as_str(),
         ))
         // Add in settings from the environment (with a prefix of APP)
         // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
