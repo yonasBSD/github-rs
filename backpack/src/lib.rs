@@ -74,9 +74,8 @@ pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
         return Ok(token);
     }
 
-    let config_path = xdg::BaseDirectories::with_prefix("")
-        .get_config_home()
-        .unwrap();
+    let base_path = directories::BaseDirs::new().expect("Get base path");
+    let config_path = base_path.config_dir();
 
     let m_token = match Config::builder()
         // Add in `./config/github-rs/config.toml`
