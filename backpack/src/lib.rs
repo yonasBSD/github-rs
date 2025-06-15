@@ -69,6 +69,17 @@ pub async fn get_repos(
     Ok(octocrab.all_pages(page).await.unwrap())
 }
 
+#[cfg(target_family = "windows")]
+pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
+    if !token.is_empty() {
+        return Ok(token);
+    }
+
+    let token = std::env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN env variable is required");
+    Ok(token)
+}
+
+#[cfg(target_family = "unix")]
 pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
     if !token.is_empty() {
         return Ok(token);
