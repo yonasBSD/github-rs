@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 octocrab = { version = "*", git = "https://github.com/yonasBSD/octocrab", branch = "yonasBSD" }
-tokio = { version = "*", features = ["full", "macros"] }
+tokio = { version = "1.45.1", features = ["full", "macros"] }
 clap = { version = "*", features = ["derive"] }
 colored = "3.0.0"
 which = "8.0.0"
