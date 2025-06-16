@@ -1,3 +1,3 @@
 [workspace]
-members = ["backpack", "xtask"]
+members = ["backpack/cli", "backpack/lib", "backpack/e2e", "xtask"]
 resolver = "2"
