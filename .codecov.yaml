@@ -1,5 +1,6 @@
 ignore:
   - 'backpack/src/main.rs'
+  - 'xtask'
   - "**/*.lock"
   - "**/*.toml"
   - "**/*.md"
