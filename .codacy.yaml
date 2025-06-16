@@ -1,0 +1,14 @@
+---
+exclude_paths:
+  - "backpack/src/main.rs"
+  - "xtask/**"
+  - "**/tests/**"
+  - "benches/**"
+  - "utils/**"
+  - ".github/**"
+  - ".gitignore"
+  - "**/*.lock"
+  - "**/*.toml"
+  - "**/*.md"
+  - "*.md"
+  - "LICENSE"
