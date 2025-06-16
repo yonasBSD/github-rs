@@ -1,9 +1,12 @@
+#![feature(coverage_attribute)]
+
 use clap::Parser;
 use colored::Colorize;
 use octocrab::models::Repository;
 use octocrab::Octocrab;
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use std::{collections::HashMap, error::Error};
+use tracing::Level;
 use which::which;
 
 /// List GitHub repos
@@ -29,6 +32,10 @@ pub fn multiply(a: i32, b: i32) -> i32 {
 }
 
 /// List GitHub repositories
+/// # Panics
+///
+/// Will panic if ...
+#[tracing::instrument]
 pub async fn get_repos(
     token: String,
     org: Option<String>,
@@ -69,6 +76,7 @@ pub async fn get_repos(
 }
 
 #[cfg(target_family = "windows")]
+#[tracing::instrument]
 pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
     if !token.is_empty() {
         return Ok(token);
@@ -79,7 +87,13 @@ pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
 }
 
 #[cfg(target_family = "unix")]
+#[tracing::instrument]
+/// # Panics
+///
+/// Will panic if unable to find config directory
 pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
+    tracing::event!(Level::TRACE, "Calling get_token()");
+
     if !token.is_empty() {
         return Ok(token);
     }
@@ -89,6 +103,8 @@ pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
     let config_path = xdg::BaseDirectories::with_prefix("")
         .get_config_home()
         .unwrap();
+
+    tracing::trace!(path = config_path.to_str(), "found xdg config path");
 
     let m_token = match Config::builder()
         // Add in `./config/github-rs/config.toml`
@@ -109,12 +125,14 @@ pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
             if app.contains_key("token") {
                 app["token"].clone()
             } else {
+                tracing::error!("could not find GitHub token");
                 println!("{}", "Error: Could not find GitHub token".red());
                 std::process::exit(1)
             }
         }
 
         Err(_) => {
+            tracing::error!("could not find GitHub token");
             println!("{}", "Error: Could not find GitHub token".red());
             std::process::exit(1);
         }
@@ -123,7 +141,12 @@ pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
     Ok(m_token)
 }
 
-pub fn make_headers(token: String) -> HeaderMap {
+#[tracing::instrument]
+/// # Panics
+///
+/// Will panic if ...
+pub fn make_headers(token: &str) -> HeaderMap {
+    tracing::event!(Level::TRACE, token = token, "Calling make_headers()");
     let mut headers = HeaderMap::new();
 
     headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
@@ -134,18 +157,20 @@ pub fn make_headers(token: String) -> HeaderMap {
     );
     headers.insert(
         AUTHORIZATION,
-        HeaderValue::from_str(&format!("token {}", token.clone())).unwrap(),
+        HeaderValue::from_str(&format!("token {token}")).unwrap(),
     );
 
     headers
 }
 
+#[tracing::instrument]
 pub async fn make_response(
     client: reqwest::Client,
     url: String,
     headers: HeaderMap,
     branch: HashMap<&str, String>,
 ) -> Result<HashMap<String, String>, Box<dyn Error>> {
+    tracing::event!(Level::TRACE, url = url, "Calling make_response()");
     let map = client
         .post(url)
         .headers(headers.clone())
@@ -158,11 +183,16 @@ pub async fn make_response(
     Ok(map)
 }
 
+#[tracing::instrument]
+/// # Panics
+///
+/// Will panic if GitHub token is missing
 pub async fn update_repos(
     repos: Vec<Repository>,
     sync: bool,
     token: String,
 ) -> Result<u32, Box<dyn Error>> {
+    //tracing::event!(Level::TRACE, is_sync = sync, token = token, "Calling update_repos()");
     let mut count = 0;
 
     for repo in repos {
@@ -177,15 +207,13 @@ pub async fn update_repos(
         }
 
         let cmd = which("gh");
-        match cmd {
-            Ok(_) => {}
-            Err(_) => {
-                println!(
-                    "{}",
-                    "Error: Could not find GitHub client program `gh`.".red()
-                );
-                std::process::exit(1);
-            }
+        if cmd.is_err() {
+            tracing::error!("could not find GitHub token");
+            println!(
+                "{}",
+                "Error: Could not find GitHub client program `gh`.".red()
+            );
+            std::process::exit(1);
         }
 
         count += 1;
@@ -206,7 +234,7 @@ pub async fn update_repos(
             .build()
             .expect("Client::new()");
 
-        let headers: HeaderMap = make_headers(token.clone());
+        let headers: HeaderMap = make_headers(&token);
         let resp: HashMap<String, String> = make_response(client, url, headers, branch).await?;
 
         if resp.contains_key("message") {
@@ -216,10 +244,12 @@ pub async fn update_repos(
                 println!("{} Synced.\n\n", "✓".green());
             } else {
                 let msg = &resp["message"];
+                tracing::error!("{}", msg);
                 println!("==> ERROR: {}\n\n", msg.red());
             }
         } else {
-            println!("==> ERROR: {:?}", resp);
+            tracing::error!("{resp:?}");
+            println!("==> ERROR: {resp:?}");
         }
     }
 
@@ -229,31 +259,39 @@ pub async fn update_repos(
 #[cfg(test)]
 mod test {
     use super::*;
+    use test_log::test;
 
-    #[test]
+    #[test_log::test]
     fn test() {
         assert_eq!(multiply(2, 2), 4);
     }
 
-    #[tokio::test]
+    #[test(tokio::test)]
+    #[cfg(not(feature = "coverage"))]
     async fn test_get_repos() -> Result<(), Box<dyn Error>> {
-        let token = std::env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN env variable is required");
+        tracing::debug!("Expect GITHUB_TOKEN env variable");
+        let token =
+            std::env::var("GITHUB_TOKEN").expect("GITHUB_TOKEN environment variable is required");
+
+        tracing::debug!(token = "None", "Call get_repos()");
         let repos_for_user = get_repos(token.clone(), None).await?;
+        tracing::debug!(token = "Some", "Call get_repos()");
         let repos_for_org = get_repos(token.clone(), Some(String::from("yonasBSD"))).await?;
 
         assert!(
-            repos_for_user.len() > 0,
+            !repos_for_user.is_empty(),
             "Able to fetch personal repositories"
         );
         assert!(
-            repos_for_org.len() > 0,
+            !repos_for_org.is_empty(),
             "Able to fetch organization repositories"
         );
 
         Ok(())
     }
 
-    #[tokio::test]
+    #[test(tokio::test)]
+    #[cfg(not(feature = "coverage"))]
     async fn test_get_token() -> Result<(), Box<dyn Error>> {
         // Test supplied token is used
         let token = String::from("some-token");
@@ -268,7 +306,8 @@ mod test {
     }
 
     #[cfg(target_family = "unix")]
-    #[tokio::test]
+    #[test(tokio::test)]
+    #[cfg(not(feature = "coverage"))]
     async fn test_get_empty_token() -> Result<(), Box<dyn Error>> {
         // Write config.toml file
         use std::io::Write;
@@ -288,7 +327,7 @@ mod test {
             // Write the config.toml file
             let mut output = std::fs::File::create(path)?;
             let line = "token = \"some-token\"";
-            let _ = write!(output, "{}", line);
+            let _ = write!(output, "{line}");
         }
 
         // Test empty token results in config file being used
@@ -296,16 +335,17 @@ mod test {
         let empty_token_result = get_token(empty_token).await?;
 
         assert!(
-            empty_token_result.len() > 0,
+            !empty_token_result.is_empty(),
             "Passing get_token() an empty token results in config file being used."
         );
 
         Ok(())
     }
 
-    #[test]
+    #[test_log::test]
+    #[cfg(not(feature = "coverage"))]
     fn test_make_headers() -> Result<(), Box<dyn Error>> {
-        let headers = make_headers(String::from("some-token"));
+        let headers = make_headers("some-token");
 
         assert!(
             headers.contains_key(USER_AGENT),
@@ -339,7 +379,8 @@ mod test {
         Ok(())
     }
 
-    #[tokio::test]
+    #[test(tokio::test)]
+    #[cfg(not(feature = "coverage"))]
     async fn test_update_repos() -> Result<(), Box<dyn Error>> {
         let mut count: u32;
         let repos: Vec<Repository> =

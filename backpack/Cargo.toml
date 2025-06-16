@@ -14,6 +14,9 @@ xdg = "3.0.0"
 reqwest = { version = "0.12.9", default-features = false, features = ["blocking", "hickory-dns", "json", "rustls-tls"] }
 serde_json = "1.0.133"
 env_logger = "0.11.5"
+tracing = { version = "0.1.41", features = ["log"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
+terminal-banner = { version = "0.4.1", features = ["color"] }
 
 [[bin]]
 name = "github-rs"
@@ -21,3 +24,6 @@ path = "src/main.rs"
 
 [features]
 coverage = []
+
+[dev-dependencies]
+test-log = { version = "0.2.17", features = ["trace"] }
