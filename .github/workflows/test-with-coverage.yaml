@@ -16,8 +16,41 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
-    name: Test
+  e2e:
+    name: End-to-End Testing
+    env:
+      PROJECT_NAME_UNDERSCORE: github-rs
+      CARGO_INCREMENTAL: 0
+      RUSTFLAGS: -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort
+      RUSTDOCFLAGS: -Cpanic=abort
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            target
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
+
+      - name: Run BDD end-to-end tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+        run: |
+          cargo test --package github-rs-e2e
+
+  coverage:
+    name: Code Coverage
     env:
       PROJECT_NAME_UNDERSCORE: github-rs
       CARGO_INCREMENTAL: 0
@@ -54,12 +87,6 @@ jobs:
       - name: Set env
         run: echo "CARGO2JUNIT_VERSION=$(curl -sL https://api.github.com/repos/yonasBSD/cargo2junit/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
 
-      - name: Run BDD tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-        run: |
-          cargo test --package github-rs-e2e
-
       - name: Generate test result and coverage report
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
@@ -72,6 +99,7 @@ jobs:
           cargo test --package github-rs-lib $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
           cargo llvm-cov nextest --package github-rs-lib --codecov --output-path ./codecov.json
 
+      # TODO: Only test the github-rs-lib package
       - name: Run xtask coverage (grcov)
         uses: actions-rs/cargo@v1
         env:
