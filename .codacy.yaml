@@ -1,6 +1,7 @@
 ---
 exclude_paths:
-  - "backpack/src/main.rs"
+  - "backpack/cli/**"
+  - "backpack/e2e/**"
   - "xtask/**"
   - "**/tests/**"
   - "benches/**"

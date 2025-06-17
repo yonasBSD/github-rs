@@ -1,0 +1,14 @@
+[package]
+name = "github-rs-e2e"
+version = "0.1.0"
+edition = "2021"
+
+[dev-dependencies]
+github-rs-lib = { package = "github-rs-lib", path = "../lib" }
+cucumber = { version = "0.21.1", features = ["libtest", "output-json", "output-junit", "timestamps", "tracing"] }
+tokio = { version = "1.45.1", features = ["full", "macros"] }
+
+[[test]]
+name = "token"
+harness = false  # allows Cucumber to print output instead of libtest
+path = "tests/token/main.rs"

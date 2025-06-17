@@ -2,7 +2,7 @@
 
 #[cfg(not(feature = "coverage"))]
 use clap::Parser;
-use github_rs::{get_repos, get_token, update_repos, Cli};
+use github_rs_lib::{get_repos, get_token, update_repos, Cli};
 use std::error::Error;
 use terminal_banner::Banner;
 

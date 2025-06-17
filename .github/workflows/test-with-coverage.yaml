@@ -54,11 +54,11 @@ jobs:
       - name: Set env
         run: echo "CARGO2JUNIT_VERSION=$(curl -sL https://api.github.com/repos/yonasBSD/cargo2junit/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
 
-      #- name: Run test
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-      #  run: |
-      #    cargo test --all-features
+      - name: Run BDD tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+        run: |
+          cargo test --package github-rs-e2e
 
       - name: Generate test result and coverage report
         env:
@@ -69,8 +69,8 @@ jobs:
           sudo dpkg -i cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           rm cargo2junit_${CARGO2JUNIT_VERSION}_amd64.deb
           cargo clean
-          cargo test --all-features $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
-          cargo llvm-cov nextest --all-features --workspace --codecov --output-path ./codecov.json
+          cargo test --package github-rs-lib $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
+          cargo llvm-cov nextest --package github-rs-lib --codecov --output-path ./codecov.json
 
       - name: Run xtask coverage (grcov)
         uses: actions-rs/cargo@v1

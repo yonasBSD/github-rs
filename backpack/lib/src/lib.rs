@@ -384,7 +384,7 @@ mod test {
     async fn test_update_repos() -> Result<(), Box<dyn Error>> {
         let mut count: u32;
         let repos: Vec<Repository> =
-            serde_json::from_str(include_str!("../../tests/resources/user_repositories.json"))
+            serde_json::from_str(include_str!("../tests/resources/user_repositories.json"))
                 .unwrap();
         let empty_repos: Vec<Repository> = Vec::new();
         let token: String = String::from("some-token");
