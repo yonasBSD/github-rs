@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
-          cargo test --package github-rs-e2e
+          cargo test --package github-rs-e2e -- --color=always
 
   coverage:
     name: Code Coverage
