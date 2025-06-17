@@ -148,3 +148,7 @@ Notes:
 - `secrets.GITHUB_TOKEN` is needed by some actions to create GitHub checks & annotations. it is added automatically by GitHub.
 - uses cache for GitHub actions.
 - clippy html output and test result output are added to random workflows for a certain commit due to limitations in the GitHub Actions API.
+
+## Repo Activity
+
+![Alt](https://repobeats.axiom.co/api/embed/a6d7cdb3696aab81174ef5054ae1229f70ed2134.svg "Repobeats analytics image")
