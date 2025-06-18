@@ -1,0 +1,2 @@
+[build]
+rustflags = ["--cfg", "tokio_unstable"]        # custom flags to pass to all compiler invocations
