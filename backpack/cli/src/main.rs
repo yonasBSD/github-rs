@@ -2,9 +2,11 @@
 
 #[cfg(not(feature = "coverage"))]
 use clap::Parser;
+use console_subscriber;
 use github_rs_lib::{get_repos, get_token, update_repos, Cli};
 use std::error::Error;
 use terminal_banner::Banner;
+use tracing_subscriber::{fmt, prelude::*, Registry};
 
 #[cfg(not(feature = "coverage"))]
 #[tokio::main]
@@ -15,9 +17,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     // construct a subscriber that prints formatted traces to stdout
-    let subscriber = tracing_subscriber::fmt()
-        // Use RUST_LOG env variable
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+    let telemetry = fmt::layer()
+        // Dislay color text
+        .with_ansi(true)
+        // Don't display timestamp
+        .without_time()
         // Use a more compact, abbreviated log format
         .compact()
         // Display source code file paths
@@ -28,19 +32,23 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .with_thread_ids(true)
         // Don't display the event's target (module path)
         .with_target(false)
-        // ...
-        //.with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
-        // Build the subscriber
-        .finish();
+        // Set log level using RUST_LOG environment variable
+        .with_filter(tracing_subscriber::EnvFilter::from_default_env());
 
-    // use that subscriber to process traces emitted after this point
-    tracing::subscriber::set_global_default(subscriber)?;
+    let registry = Registry::default()
+        // Set custom formatting
+        .with(telemetry)
+        // Send traces to tokio console
+        .with(console_subscriber::spawn());
+
+    tracing::subscriber::set_global_default(registry)?;
 
     tracing::debug!("Logging initialized!");
     tracing::trace!("Tracing initialized!");
     tracing::debug!("Ready to begin...");
 
-    if std::env::var("RUST_LOG").unwrap().to_lowercase() == "debug" {
+    if vec!["debug", "trace"].contains(&std::env::var("RUST_LOG").unwrap().to_lowercase().as_str())
+    {
         let banner = Banner::new()
             .text("Welcome to github-rs!".into())
             .text("Easily sync all your forked repos.".into())

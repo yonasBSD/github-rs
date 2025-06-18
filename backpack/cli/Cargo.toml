@@ -10,6 +10,7 @@ clap = { version = "*", features = ["derive"] }
 tracing = { version = "0.1.41", features = ["log"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
 terminal-banner = { version = "0.4.1", features = ["color"] }
+console-subscriber = "0.4.1"
 
 [[bin]]
 name = "github-rs"
