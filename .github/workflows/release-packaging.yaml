@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 name: Release Packaging
 
@@ -28,16 +28,16 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
         run: |
-           wget https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_amd64.deb
-           sudo dpkg -i nfpm_${NFPM_VERSION}_amd64.deb
-           rm nfpm_${NFPM_VERSION}_amd64.deb
-           sed -i -E "s/^version:.+$/version: $VERSION/g" nfpm.yaml
-           mkdir scripts
-           touch foo bar scripts/postremove.sh scripts/preremove.sh scripts/preinstall.sh scripts/postinstall.sh changelog.yaml foobar.conf
-           for pkg in deb apk archlinux rpm ipk; do
-              nfpm package -p $pkg
-           done
-           mv target/release/${{ env.PROJECT_NAME_UNDERSCORE }} ${{ env.PROJECT_NAME_UNDERSCORE }}
+          wget https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_amd64.deb
+          sudo dpkg -i nfpm_${NFPM_VERSION}_amd64.deb
+          rm nfpm_${NFPM_VERSION}_amd64.deb
+          sed -i -E "s/^version:.+$/version: $VERSION/g" nfpm.yaml
+          mkdir scripts
+          touch foo bar scripts/postremove.sh scripts/preremove.sh scripts/preinstall.sh scripts/postinstall.sh changelog.yaml foobar.conf
+          for pkg in deb apk archlinux rpm ipk; do
+             nfpm package -p $pkg
+          done
+          mv target/release/${{ env.PROJECT_NAME_UNDERSCORE }} ${{ env.PROJECT_NAME_UNDERSCORE }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

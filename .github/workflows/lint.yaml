@@ -13,7 +13,6 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-
   fmt:
     name: Rustfmt and treefmt
     runs-on: ubuntu-latest
