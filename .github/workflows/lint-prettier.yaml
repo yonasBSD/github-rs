@@ -1,0 +1,24 @@
+name: Lint - Prettier
+
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    name: Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Prettier
+        uses: AbdulRehman-1/pr-prettier@latest
+        with:
+          prettier_options: --write **/*.{js,md,yaml,yml}
