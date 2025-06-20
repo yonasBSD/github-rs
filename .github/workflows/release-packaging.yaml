@@ -63,6 +63,9 @@ jobs:
             *.rpm
             *.zst
 
+      - name: Upload SBOM
+        uses: anchore/sbom-action@v0
+
     #- name: Output artifact ID
     #  run:  echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
 
