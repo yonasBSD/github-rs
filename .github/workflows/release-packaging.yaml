@@ -19,7 +19,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@nightly
 
       - name: Release Build
-        run: cargo build --release
+        run: cargo build --release --profile github-rs-cli
 
       - name: Set env
         run: echo "NFPM_VERSION=$(curl -sL https://api.github.com/repos/goreleaser/nfpm/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
