@@ -1,7 +1,7 @@
 ignore:
-  - 'backpack/cli'
-  - 'backpack/e2e'
-  - 'xtask'
+  - "backpack/cli"
+  - "backpack/e2e"
+  - "xtask"
   - "**/*.lock"
   - "**/*.toml"
   - "**/*.md"

@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 env:
   #ENV: dev
@@ -6,7 +6,7 @@ env:
   #ENV: staging
   ENV: production
 
-dotenv: ['.env', '{{ .taskEnv }}']
+dotenv: [".env", "{{ .taskEnv }}"]
 
 vars:
   project: Hello World
@@ -15,7 +15,6 @@ vars:
   chat: https://chat.example.com
   ircserver: irc.libera.chat
   ircroom: help
-  homepage: https://example.com
   author: Acme Inc.
   version: 0.0.1
   build:
@@ -30,7 +29,6 @@ vars:
   taskEnv: .task.env
 
 tasks:
-
   default:
     cmds:
       - task: hello
@@ -51,7 +49,7 @@ tasks:
 
   build:
     desc: Build
-    deps: ['build:templates']
+    deps: ["build:templates"]
     cmds:
       - cargo auditable build --release
       - defer: { task: cleanup }
@@ -59,14 +57,14 @@ tasks:
   build:templates:
     desc: "Compile templates"
     sources:
-      - '**/*.j2'
+      - "**/*.j2"
     cmds:
       - for: sources
         cmd: minijinja-cli --strict --format toml --output $(basename {{ .ITEM }} .j2) {{ .ITEM }} variables.toml
 
   test:
     desc: Run tests
-    deps: ['test:code', 'test:scripts', 'test:apis']
+    deps: ["test:code", "test:scripts", "test:apis"]
 
   test:code:
     desc: Test code
@@ -76,7 +74,7 @@ tasks:
   test:code:rust:
     desc: "Test Rust code"
     sources:
-      - '**/*.rs'
+      - "**/*.rs"
     cmds:
       - cargo test --all-features
 
@@ -93,7 +91,7 @@ tasks:
   run:venom:
     desc: Run venom scripted tests
     sources:
-      - '**/*.venom.yaml'
+      - "**/*.venom.yaml"
     run: always
     cmds:
       - for: sources
@@ -111,7 +109,7 @@ tasks:
   run:hurl:
     desc: Run hurl API tests
     sources:
-      - '**/*.hurl.yaml'
+      - "**/*.hurl.yaml"
     run: always
     cmds:
       - for: sources
@@ -131,12 +129,12 @@ tasks:
 
   lint:
     desc: Lint code
-    deps: ['run:lychee', 'run:cargo-outdated']
+    deps: ["run:lychee", "run:cargo-outdated"]
 
   run:lychee:
     desc: Run lychee link checker
     sources:
-      - '**/*.md'
+      - "**/*.md"
     cmds:
       - for: sources
         cmd: if ! test "$PWD" != "${PWD%node_modules*}" ; echo lychee {{ .ITEM }} ; fi
@@ -144,14 +142,14 @@ tasks:
   run:cargo-outdated:
     desc: Run cargo outdated
     sources:
-      - '**/Cargo.toml'
+      - "**/Cargo.toml"
     cmds:
       - for: sources
         cmd: cd $(dirname {{ .ITEM }}) ; cargo outdated
 
   format:
     desc: Format code
-    deps: ['run:treefmt']
+    deps: ["run:treefmt"]
 
   run:treefmt:
     desc: Run treefmt
@@ -161,49 +159,49 @@ tasks:
 
   docs:
     desc: Build documentation pages
-    deps: ['run:mdbook', 'run:zola']
+    deps: ["run:mdbook", "run:zola"]
 
   run:mdbook:
     desc: Build mdbook technical notes
     generates:
-      - './docs/technical/mdbook'
+      - "./docs/technical/mdbook"
     cmds:
       - echo Building mdbook...
       - if [ ! -d mdbook ]; then mkdir -p docs/technical ; cd docs/technical ; mdbook init mdbook --title "Technical Documentation" --ignore git; fi
       - cd docs/technical/mdbook ; mkdir -p ../../../build/docs/technical/mdbook ; mdbook build --dest-dir ../../../build/docs/technical/mdbook
-      - 'echo Start server: mdbook serve --dest-dir ../../../build/docs/technical/mdbook --port 3001'
+      - "echo Start server: mdbook serve --dest-dir ../../../build/docs/technical/mdbook --port 3001"
 
   #run:docusourus:
-    #desc: Build docusourus user guides
-    #vars:
-    #GIT_OWNER:
-        #sh: git remote get-url origin | grep owner
-    #GIT_PROJECT:
-        #sh: git remote get-url origin | grep owner
-    #generates:
-      #- './docs/user-guides/docusourus'
-    #cmds:
-      #- echo Building docusourus...
-      #- if [ ! -d docusourus ]; then npx --yes create-docusaurus@latest --typescript --git-strategy shallow --package-manager yarn docusourus classic ; fi
-      #- cd docusourus
-      #- 'sd --fixed-strings "facebook/docusourus" "{{.GIT_OWNER}}/{{.GIT_PROJECT}}" docusaurus.config.ts'
-      #- 'sd "organizationName: .facebook." "{{.GIT_OWNER}}" docusaurus.config.ts'
-      #- yarn build
-      #- 'echo Start server: www --port 3002 build'
+  #desc: Build docusourus user guides
+  #vars:
+  #GIT_OWNER:
+  #sh: git remote get-url origin | grep owner
+  #GIT_PROJECT:
+  #sh: git remote get-url origin | grep owner
+  #generates:
+  #- './docs/user-guides/docusourus'
+  #cmds:
+  #- echo Building docusourus...
+  #- if [ ! -d docusourus ]; then npx --yes create-docusaurus@latest --typescript --git-strategy shallow --package-manager yarn docusourus classic ; fi
+  #- cd docusourus
+  #- 'sd --fixed-strings "facebook/docusourus" "{{.GIT_OWNER}}/{{.GIT_PROJECT}}" docusaurus.config.ts'
+  #- 'sd "organizationName: .facebook." "{{.GIT_OWNER}}" docusaurus.config.ts'
+  #- yarn build
+  #- 'echo Start server: www --port 3002 build'
 
   run:zola:
     desc: Build zola blog and release notes
     generates:
-      - './docs/blog/zola'
+      - "./docs/blog/zola"
     cmds:
       - echo Building zola...
       - if [ ! -d zola ]; then mkdir -p docs/blog ; cd docs/blog ; zola init zola ; fi
       - cd docs/blog/zola ; mkdir -p ../../../build/docs/blog/zola ; zola build --force --base-url https://localhost:3004 --output-dir ../../../build/docs/blog/zola
-      - 'echo Start server: www --port 3004 ../../../build/docs/blog/zola'
+      - "echo Start server: www --port 3004 ../../../build/docs/blog/zola"
 
   audit:
     desc: Perform a security audit
-    deps: ['audit:secrets', 'audit:vulnerabilities', 'audit:code-quality']
+    deps: ["audit:secrets", "audit:vulnerabilities", "audit:code-quality"]
 
   audit:secrets:
     desc: Scan for secrets

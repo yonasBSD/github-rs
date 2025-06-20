@@ -16,8 +16,8 @@ homepage: "http://github.com/yonasBSD/github-rs"
 license: "MIT"
 changelog: "changelog.yaml"
 contents:
-- src: ./target/release/github-rs
-  dst: /usr/bin/github-rs
+  - src: ./target/release/github-rs
+    dst: /usr/bin/github-rs
 overrides:
   rpm:
     scripts:
