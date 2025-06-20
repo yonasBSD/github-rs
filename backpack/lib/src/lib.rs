@@ -196,7 +196,7 @@ pub async fn update_repos(
     let mut count = 0;
 
     for repo in repos {
-        if !sync {
+        if !sync || repo.parent.is_none() {
             println!(
                 "{}, {}",
                 repo.full_name.unwrap(),
@@ -216,7 +216,6 @@ pub async fn update_repos(
             std::process::exit(1);
         }
 
-        count += 1;
         println!(
             "=========== Updating {} ===========\n",
             &repo.full_name.clone().unwrap()
@@ -241,6 +240,7 @@ pub async fn update_repos(
             if resp["message"].contains("This branch is not behind the upstream")
                 || resp["message"].contains("Successfully fetched and fast-forwarded from upstream")
             {
+                count += 1;
                 println!("{} Synced.\n\n", "✓".green());
             } else {
                 let msg = &resp["message"];
@@ -386,13 +386,16 @@ mod test {
         let repos: Vec<Repository> =
             serde_json::from_str(include_str!("../tests/resources/user_repositories.json"))
                 .unwrap();
+        let forked_repos: Vec<Repository> =
+            serde_json::from_str(include_str!("../tests/resources/forked_repositories.json"))
+                .unwrap();
         let empty_repos: Vec<Repository> = Vec::new();
         let token: String = String::from("some-token");
 
         // Test with empty list of repos
         count = update_repos(empty_repos.clone(), false, token.clone())
             .await
-            .expect("update repos");
+            .expect("update empty repos without sync");
         assert_eq!(
             count, 0,
             "Pass empty vector to update_repos() without sync."
@@ -400,19 +403,43 @@ mod test {
 
         count = update_repos(empty_repos.clone(), true, token.clone())
             .await
-            .expect("update repos");
+            .expect("update empty repos with sync");
         assert_eq!(count, 0, "Pass empty vector to update_repos() with sync.");
 
         // Test with some repos
+        // sync = false, parent repo = false
         count = update_repos(repos.clone(), false, token.clone())
             .await
             .expect("update repos");
         assert_eq!(count, 0, "Pass vector to update_repos() without sync.");
 
+        // sync = true, parent repo = false
         count = update_repos(repos.clone(), true, token.clone())
             .await
-            .expect("update repos");
-        assert_eq!(count, 2, "Pass vector to update_repos() with sync.");
+            .expect("sync repos without parent");
+        assert_eq!(
+            count, 0,
+            "Pass vector to update_repos() with sync and no parent repo."
+        );
+
+        // sync = false, parent repo = true
+        count = update_repos(forked_repos.clone(), false, token.clone())
+            .await
+            .expect("update repos with parent");
+        assert_eq!(
+            count, 0,
+            "Pass vector to update_repos() without sync and some parent repos."
+        );
+
+        // sync = true, parent repo = true
+        let github_token = get_token(String::from("")).await?;
+        count = update_repos(forked_repos.clone(), true, github_token.clone())
+            .await
+            .expect("sync repos with parent");
+        assert!(
+            count > 0,
+            "Pass vector to update_repos() with sync and some parent repos."
+        );
 
         Ok(())
     }
