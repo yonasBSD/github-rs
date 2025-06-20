@@ -196,9 +196,17 @@ pub async fn update_repos(
     let mut count = 0;
 
     for repo in repos {
-        if !sync || repo.parent.is_none() {
+        if !sync {
             println!(
                 "{}, {}",
+                repo.full_name.unwrap(),
+                repo.default_branch.unwrap()
+            );
+
+            continue;
+        } else if !repo.fork.unwrap() {
+            println!(
+                "Skipped: {}, {}",
                 repo.full_name.unwrap(),
                 repo.default_branch.unwrap()
             );
