@@ -11,9 +11,11 @@ use tracing_subscriber::{fmt, prelude::*, Registry};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Set environment for logging configuration
+    /*
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "info");
     }
+    */
 
     // construct a subscriber that prints formatted traces to stdout
     let telemetry = fmt::layer()
@@ -46,7 +48,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     tracing::trace!("Tracing initialized!");
     tracing::debug!("Ready to begin...");
 
-    if ["debug", "trace"].contains(&std::env::var("RUST_LOG").unwrap().to_lowercase().as_str()) {
+    if std::env::var("RUST_LOG").is_ok()
+        && ["debug", "trace"].contains(&std::env::var("RUST_LOG").unwrap().to_lowercase().as_str())
+    {
         let banner = Banner::new()
             .text("Welcome to github-rs!".into())
             .text("Easily sync all your forked repos.".into())
