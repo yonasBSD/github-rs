@@ -14,9 +14,9 @@ All notable changes to this project will be documented in this file.
 
 ### 💼 Other
 
-- *(deps)* Bump github/codeql-action from 3.27.5 to 3.29.0 (#29)
-- *(deps)* Bump ossf/scorecard-action from 2.4.1 to 2.4.2 (#27)
-- *(deps)* Bump dtolnay/rust-toolchain (#26)
+- _(deps)_ Bump github/codeql-action from 3.27.5 to 3.29.0 (#29)
+- _(deps)_ Bump ossf/scorecard-action from 2.4.1 to 2.4.2 (#27)
+- _(deps)_ Bump dtolnay/rust-toolchain (#26)
 
 ### 🧪 Testing
 
@@ -30,7 +30,7 @@ All notable changes to this project will be documented in this file.
 
 ### 🛡️ Security
 
-- *(deps)* Bump step-security/harden-runner from 2.10.2 to 2.12.1 (#30)
+- _(deps)_ Bump step-security/harden-runner from 2.10.2 to 2.12.1 (#30)
 
 ## [1.1.0] - 2025-06-15
 
@@ -72,15 +72,15 @@ All notable changes to this project will be documented in this file.
 
 ### 💼 Other
 
-- *(deps)* Bump mozilla-actions/sccache-action from 0.0.5 to 0.0.6 (#1)
-- *(deps)* Bump mozilla-actions/sccache-action from 0.0.6 to 0.0.7 (#3)
-- *(deps)* Update config requirement from 0.14.1 to 0.15.4 (#4)
-- *(deps)* Update colored requirement from 2.1.0 to 3.0.0 (#5)
-- *(deps)* Bump mozilla-actions/sccache-action from 0.0.7 to 0.0.8 (#6)
-- *(deps)* Bump mozilla-actions/sccache-action from 0.0.8 to 0.0.9 (#7)
-- *(deps)* Update duct requirement from 0.13.5 to 1.0.0 (#9)
-- *(deps)* Update xdg requirement from 2.5.2 to 3.0.0 (#8)
-- *(deps)* Update which requirement from 7.0.0 to 8.0.0 (#10)
+- _(deps)_ Bump mozilla-actions/sccache-action from 0.0.5 to 0.0.6 (#1)
+- _(deps)_ Bump mozilla-actions/sccache-action from 0.0.6 to 0.0.7 (#3)
+- _(deps)_ Update config requirement from 0.14.1 to 0.15.4 (#4)
+- _(deps)_ Update colored requirement from 2.1.0 to 3.0.0 (#5)
+- _(deps)_ Bump mozilla-actions/sccache-action from 0.0.7 to 0.0.8 (#6)
+- _(deps)_ Bump mozilla-actions/sccache-action from 0.0.8 to 0.0.9 (#7)
+- _(deps)_ Update duct requirement from 0.13.5 to 1.0.0 (#9)
+- _(deps)_ Update xdg requirement from 2.5.2 to 3.0.0 (#8)
+- _(deps)_ Update which requirement from 7.0.0 to 8.0.0 (#10)
 
 ### 🚜 Refactor
 
@@ -130,7 +130,7 @@ All notable changes to this project will be documented in this file.
 
 ### 💼 Other
 
-- *(deps)* Bump mozilla-actions/sccache-action from 0.0.5 to 0.0.6 (#1)
+- _(deps)_ Bump mozilla-actions/sccache-action from 0.0.5 to 0.0.6 (#1)
 
 ### 🚜 Refactor
 
