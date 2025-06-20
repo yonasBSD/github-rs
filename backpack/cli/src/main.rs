@@ -2,7 +2,6 @@
 
 #[cfg(not(feature = "coverage"))]
 use clap::Parser;
-use console_subscriber;
 use github_rs_lib::{get_repos, get_token, update_repos, Cli};
 use std::error::Error;
 use terminal_banner::Banner;
@@ -47,8 +46,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     tracing::trace!("Tracing initialized!");
     tracing::debug!("Ready to begin...");
 
-    if vec!["debug", "trace"].contains(&std::env::var("RUST_LOG").unwrap().to_lowercase().as_str())
-    {
+    if ["debug", "trace"].contains(&std::env::var("RUST_LOG").unwrap().to_lowercase().as_str()) {
         let banner = Banner::new()
             .text("Welcome to github-rs!".into())
             .text("Easily sync all your forked repos.".into())
