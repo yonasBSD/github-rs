@@ -73,6 +73,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     continue-on-error: ${{ matrix.rust == 'nightly' }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      NEXTEST_PROFILE: coverage # defined in .config/nextest.toml
     strategy:
       matrix:
         rust: [nightly]
@@ -86,6 +89,7 @@ jobs:
         with:
           release: "14.3"
           usesh: true
+          envs: 'GITHUB_TOKEN NEXTEST_PROFILE'
           prepare: |
             pkg install -y curl git
             curl --proto '=https' --tlsv1.3 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain ${{ matrix.rust }} --profile minimal -y
@@ -104,6 +108,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     continue-on-error: ${{ matrix.rust == 'nightly' }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      NEXTEST_PROFILE: coverage # defined in .config/nextest.toml
     strategy:
       matrix:
         rust: [nightly]
@@ -116,6 +123,7 @@ jobs:
         with:
           release: "10.1"
           usesh: true
+          envs: 'GITHUB_TOKEN NEXTEST_PROFILE'
           prepare: |
             PATH="/root/.cargo/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
             PKG_PATH="https://ftp.netbsd.org/pub/pkgsrc/packages/NetBSD/amd64/10.1/All/"
