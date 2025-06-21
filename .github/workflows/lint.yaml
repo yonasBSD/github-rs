@@ -14,19 +14,32 @@ env:
 
 jobs:
   fmt:
-    name: Rustfmt and treefmt
+    name: Rustfmt, Treefmt, Prettier
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: mozilla-actions/sccache-action@v0.0.9
 
-      - uses: dtolnay/rust-toolchain@nightly
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Prettier
+        uses: AbdulRehman-1/pr-prettier@initial
+        with:
+          prettier_options: --write **/*.{js,md,yaml,yml}
+
+      - name: Setup Cache
+        uses: mozilla-actions/sccache-action@v0.0.9
+
+      - name: Install Toolchain
+        uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
-      - run: cargo fmt --version
-      - run: cargo fmt --all --check
 
-      - name: treefmt
+      - name: Rust Format (rustfmt)
+        run: |
+          cargo fmt --version
+          cargo fmt --all --check
+
+      - name: Tree Format (treefmt)
         run: |
           curl -s https://api.github.com/repos/numtide/treefmt/tags | jq -r '.[0].name' > .ver
           curl -sSLo treefmt.tgz https://github.com/numtide/treefmt/releases/download/$(cat .ver)/treefmt_$(cat .ver | cut -d'v' -f2)_linux_amd64.tar.gz
@@ -38,6 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
       - uses: mozilla-actions/sccache-action@v0.0.9
 
       - uses: dtolnay/rust-toolchain@nightly
@@ -59,6 +76,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Conventional commit check
         uses: cocogitto/cocogitto-action@main
