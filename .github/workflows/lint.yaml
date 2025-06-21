@@ -85,7 +85,7 @@ jobs:
           name: Clippy Output
 
   conventional_commits:
-    name: Check conventional commit compliance
+    name: Conventional Commit Compliance
     runs-on: ubuntu-latest
 
     steps:
