@@ -37,7 +37,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         with:
-          commit_message: 'fix: Prettified Code!'
+          commit_message: "fix: Prettified Code!"
           prettier_options: --write **/*.{js,md,yaml,yml}
           github_token: ${{ secrets.WORKFLOW_TOKEN }}
 
@@ -61,8 +61,7 @@ jobs:
           cargo fmt --all --check
 
       - name: Tree Format (treefmt)
-        run:
-          ./treefmt
+        run: ./treefmt
 
   clippy:
     name: Clippy
