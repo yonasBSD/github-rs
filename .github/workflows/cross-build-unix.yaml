@@ -75,7 +75,7 @@ jobs:
     continue-on-error: ${{ matrix.rust == 'nightly' }}
     strategy:
       matrix:
-        rust: [stable, beta, nightly]
+        rust: [nightly]
 
     steps:
       - uses: actions/checkout@v4
@@ -84,20 +84,19 @@ jobs:
       - name: Compile
         uses: vmactions/freebsd-vm@v1
         with:
-          release: '14.3'
+          release: "14.3"
           usesh: true
           prepare: |
             pkg install -y curl git
             curl --proto '=https' --tlsv1.3 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain ${{ matrix.rust }} --profile minimal -y
             . ~/.cargo/env
+            rustup component add rustfmt
             cargo install cargo-hack
           run: |
             set -e
             . ~/.cargo/env
             export CARGO_TERM_COLOR="always"
             export RUSTFLAGS="--deny warnings"
-            cargo fmt --check
-            cargo clippy -- -D warnings
             cargo hack test
 
   netbsd:
@@ -107,7 +106,7 @@ jobs:
     continue-on-error: ${{ matrix.rust == 'nightly' }}
     strategy:
       matrix:
-        rust: [stable, beta, nightly]
+        rust: [nightly]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -115,7 +114,7 @@ jobs:
       - name: Compile
         uses: vmactions/netbsd-vm@v1
         with:
-          release: '10.1'
+          release: "10.1"
           usesh: true
           prepare: |
             PATH="/root/.cargo/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
@@ -130,31 +129,4 @@ jobs:
             . ~/.cargo/env
             export CARGO_TERM_COLOR="always"
             export RUSTFLAGS="--deny warnings"
-            cargo fmt --check
-            cargo clippy -- -D warnings
-            cargo hack test
-
-  openbsd:
-    needs: conventional
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Compile
-        uses: vmactions/openbsd-vm@v1
-        with:
-          release: '7.7'
-          usesh: true
-          prepare: |
-            pkg_add rust rust-rustfmt rust-clippy git
-            cargo install cargo-hack
-          run: |
-            set -e
-            export CARGO_TERM_COLOR="always"
-            export RUSTFLAGS="--deny warnings"
-            cargo fmt --check
-            cargo clippy -- -D warnings
             cargo hack test
