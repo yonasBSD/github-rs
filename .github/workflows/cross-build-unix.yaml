@@ -89,7 +89,7 @@ jobs:
         with:
           release: "14.3"
           usesh: true
-          envs: 'GITHUB_TOKEN NEXTEST_PROFILE'
+          envs: "GITHUB_TOKEN NEXTEST_PROFILE"
           prepare: |
             pkg install -y curl git
             curl --proto '=https' --tlsv1.3 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain ${{ matrix.rust }} --profile minimal -y
@@ -123,7 +123,7 @@ jobs:
         with:
           release: "10.1"
           usesh: true
-          envs: 'GITHUB_TOKEN NEXTEST_PROFILE'
+          envs: "GITHUB_TOKEN NEXTEST_PROFILE"
           prepare: |
             PATH="/root/.cargo/bin:/usr/pkg/sbin:/usr/pkg/bin:$PATH"
             PKG_PATH="https://ftp.netbsd.org/pub/pkgsrc/packages/NetBSD/amd64/10.1/All/"
