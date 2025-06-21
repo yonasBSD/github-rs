@@ -16,15 +16,30 @@ jobs:
   fmt:
     name: Rustfmt, Treefmt, Prettier
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+      statuses: write
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
+        id: checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.WORKFLOW_TOKEN }}
 
+      # Run Prettier before codebase changes to avoid
+      # commiting artifacts
       - name: Prettier
         uses: AbdulRehman-1/pr-prettier@initial
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         with:
+          commit_message: "fix: Prettified Code!"
           prettier_options: --write **/*.{js,md,yaml,yml}
+          github_token: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Setup Cache
         uses: mozilla-actions/sccache-action@v0.0.9
@@ -34,17 +49,19 @@ jobs:
         with:
           components: rustfmt
 
+      - name: Install Tree Format (treefmt)
+        run: |
+          curl -s https://api.github.com/repos/numtide/treefmt/tags | jq -r '.[0].name' > .ver
+          curl -sSLo treefmt.tgz https://github.com/numtide/treefmt/releases/download/$(cat .ver)/treefmt_$(cat .ver | cut -d'v' -f2)_linux_amd64.tar.gz
+          tar -xvf treefmt.tgz
+
       - name: Rust Format (rustfmt)
         run: |
           cargo fmt --version
           cargo fmt --all --check
 
       - name: Tree Format (treefmt)
-        run: |
-          curl -s https://api.github.com/repos/numtide/treefmt/tags | jq -r '.[0].name' > .ver
-          curl -sSLo treefmt.tgz https://github.com/numtide/treefmt/releases/download/$(cat .ver)/treefmt_$(cat .ver | cut -d'v' -f2)_linux_amd64.tar.gz
-          tar -xvf treefmt.tgz
-          ./treefmt
+        run: ./treefmt
 
   clippy:
     name: Clippy
