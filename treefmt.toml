@@ -1,0 +1,5 @@
+[formatter.rustfmt]
+command = "rustfmt"
+excludes = []
+includes = ["*.rs"]
+options = ["--edition", "2021"]

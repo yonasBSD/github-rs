@@ -1,0 +1,27 @@
+[package]
+name = "github-rs-lib"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/yonasBSD/github-rs"
+
+[features]
+coverage = []
+
+[dependencies]
+octocrab = { version = "*", git = "https://github.com/yonasBSD/octocrab", branch = "yonasBSD" }
+tokio = { version = "1.45.1", features = ["full", "macros"] }
+clap = { version = "*", features = ["derive"] }
+colored = "3.0.0"
+which = "8.0.0"
+config = "0.15.4"
+xdg = "3.0.0"
+reqwest = { version = "0.12.9", default-features = false, features = ["blocking", "hickory-dns", "json", "rustls-tls"] }
+serde_json = "1.0.133"
+env_logger = "0.11.5"
+tracing = { version = "0.1.41", features = ["log"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
+terminal-banner = { version = "0.4.1", features = ["color"] }
+
+[dev-dependencies]
+test-log = { version = "0.2.17", features = ["trace", "color"] }

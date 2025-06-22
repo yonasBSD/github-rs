@@ -1,0 +1,114 @@
+on:
+  push:
+    tags:
+      - "v*"
+
+name: Release Packaging
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  release:
+    name: Release Packaging
+    env:
+      PROJECT_NAME_UNDERSCORE: github-rs
+      PROJECT_TARGET: x86_64-unknown-linux-gnu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Release Build
+        uses: yonasBSD/toolkit@main
+        with:
+          run: |
+            rustup default nightly
+            cargo auditable build --release --package github-rs
+
+      - name: About Licenses
+        uses: yonasBSD/toolkit@main
+        with:
+          run: |
+            rustup default nightly
+            cargo about init
+            cargo about generate about.hbs --output-file licenses.html
+
+      - name: Set env
+        run: echo "NFPM_VERSION=$(curl -sL https://api.github.com/repos/goreleaser/nfpm/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
+
+      - name: Create Packages
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          wget https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_amd64.deb
+          sudo dpkg -i nfpm_${NFPM_VERSION}_amd64.deb
+          rm nfpm_${NFPM_VERSION}_amd64.deb
+          sed -i -E "s/^version:.+$/version: $VERSION/g" nfpm.yaml
+          mkdir scripts
+          touch foo bar scripts/postremove.sh scripts/preremove.sh scripts/preinstall.sh scripts/postinstall.sh changelog.yaml foobar.conf
+          for pkg in deb apk archlinux rpm ipk; do
+             nfpm package -p $pkg
+          done
+          cp target/release/${{ env.PROJECT_NAME_UNDERSCORE }} .
+          tar --zstd -cf ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst ${{ env.PROJECT_NAME_UNDERSCORE }}
+
+      - name: Sign Packages
+        uses: yonasBSD/toolkit@main
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        with:
+          run: |
+            echo "$SIGNING_KEY" > signing.key
+            for file in `find . -name '*.deb' -or -name '*.apk' -or -name '*.ipk' -or -name '*.rpm' -or -name '*.zst' -or -name '*.html'`; do rsign sign -W -s signing.key -x $file.sig $file ; done
+            rsign sign -W -s signing.key -x ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst.sig ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        id: artifact-upload-step
+        with:
+          name: ${{ env.PROJECT_NAME_UNDERSCORE }}
+          path: |
+            ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst
+            *.deb
+            *.apk
+            *.ipk
+            *.rpm
+            *.zst
+            *.html
+            *.sig
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst
+            *.deb
+            *.apk
+            *.ipk
+            *.rpm
+            *.zst
+            *.html
+            *.sig
+
+      - name: Upload SBOM
+        uses: anchore/sbom-action@v0
+
+    #- name: Output artifact ID
+    #  run:  echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
+
+    #  - name: Create Release
+    #    env:
+    #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #      tag: ${{ github.ref_name }}
+    #       gh release create "$tag" \
+    #         --repo="$GITHUB_REPOSITORY" \
+    #         --title="${tag#v}" \
+    #         --generate-notes

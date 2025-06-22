@@ -1,0 +1,22 @@
+ignore:
+  - "backpack/cli"
+  - "backpack/e2e"
+  - "xtask"
+  - "**/*.lock"
+  - "**/*.toml"
+  - "**/*.md"
+  - "utils"
+  - "**/tests"
+  - "LICENSE"
+  - ".github"
+  - ".gitignore"
+  - "benches"
+
+coverage:
+  status:
+    project:
+      default:
+        # We aim for ~80% as that's reasonable without testing **all**
+        # error cases, even those that're unrealistic or hard edge-cases.
+        target: 80
+        threshold: 2%

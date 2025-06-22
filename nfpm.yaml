@@ -1,0 +1,29 @@
+# nfpm example configuration file
+#
+# check https://nfpm.goreleaser.com/configuration for detailed usage
+#
+name: "github-rs"
+arch: "amd64"
+platform: "linux"
+version: "1.0.0"
+section: "default"
+priority: "extra"
+maintainer: "John Doe <john@example.com>"
+description: |
+  CLI to the GitHub API.
+vendor: "FooBar Corp"
+homepage: "http://github.com/yonasBSD/github-rs"
+license: "MIT"
+changelog: "changelog.yaml"
+contents:
+  - src: ./target/release/github-rs
+    dst: /usr/bin/github-rs
+overrides:
+  rpm:
+    scripts:
+      preinstall: ./scripts/preinstall.sh
+      postremove: ./scripts/postremove.sh
+  deb:
+    scripts:
+      postinstall: ./scripts/postinstall.sh
+      preremove: ./scripts/preremove.sh

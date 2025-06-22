@@ -1,0 +1,4 @@
+[workspace]
+members = ["backpack/cli", "backpack/lib", "backpack/e2e", "xtask"]
+resolver = "2"
+default-members = ["backpack/cli"]

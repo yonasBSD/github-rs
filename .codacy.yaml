@@ -1,0 +1,15 @@
+---
+exclude_paths:
+  - "backpack/cli/**"
+  - "backpack/e2e/**"
+  - "xtask/**"
+  - "**/tests/**"
+  - "benches/**"
+  - "utils/**"
+  - ".github/**"
+  - ".gitignore"
+  - "**/*.lock"
+  - "**/*.toml"
+  - "**/*.md"
+  - "*.md"
+  - "LICENSE"
