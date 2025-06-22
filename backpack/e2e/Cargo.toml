@@ -2,6 +2,7 @@
 name = "github-rs-e2e"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [dev-dependencies]
 github-rs-lib = { package = "github-rs-lib", path = "../lib" }
