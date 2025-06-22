@@ -17,9 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
+      - uses: yonasBSD/toolkit@main
 
       - name: Release Build
         run: cargo build --release --profile github-rs-cli
+
+      - name: About Licenses
+        run: |
+          cargo about init
+          cargo about generate about.hbs --output-file licenses.html
 
       - name: Set env
         run: echo "NFPM_VERSION=$(curl -sL https://api.github.com/repos/goreleaser/nfpm/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)" >> $GITHUB_ENV
@@ -62,6 +68,7 @@ jobs:
             *.ipk
             *.rpm
             *.zst
+            *.html
             *.sig
 
       - name: Create Release
