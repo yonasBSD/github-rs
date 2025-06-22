@@ -20,7 +20,7 @@ jobs:
       - uses: yonasBSD/toolkit@main
 
       - name: Release Build
-        run: cargo build --release --profile github-rs-cli
+        run: cargo build --release
 
       - name: About Licenses
         run: |
