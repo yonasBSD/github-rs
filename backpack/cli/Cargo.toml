@@ -22,3 +22,7 @@ coverage = []
 
 [dev-dependencies]
 test-log = { version = "0.2.17", features = ["trace", "color"] }
+
+[package.metadata.binstall.signing]
+algorithm = "minisign"
+pubkey = "RWTh+qhYzYlexX4kGzx5rrGBzzFY7mBXn4wlQkDbMeZjnGFuC03u7AOZ"
