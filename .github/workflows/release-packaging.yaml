@@ -17,12 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
-      - uses: yonasBSD/toolkit@main
 
       - name: Release Build
+        uses: yonasBSD/toolkit@main
         run: cargo auditable build --release
 
       - name: About Licenses
+        uses: yonasBSD/toolkit@main
         run: |
           cargo about init
           cargo about generate about.hbs --output-file licenses.html
@@ -46,6 +47,7 @@ jobs:
           mv target/release/${{ env.PROJECT_NAME_UNDERSCORE }} ${{ env.PROJECT_NAME_UNDERSCORE }}
 
       - name: Sign Packages
+        uses: yonasBSD/toolkit@main
         run: |
           echo "${{ secrets.SIGNING_KEY }}" > signing.key
           for file in `find /tmp -name '*.deb' -or -name '*.apk' -or -name '*.ipk'` -or -name '*.rpm'` -or -name '*.zst'` -or -name '*.html'` ; do
