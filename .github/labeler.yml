@@ -1,0 +1,20 @@
+critical:
+  - "/(critical|urgent)/i"
+
+needs-triage:
+  - "/.*/"
+
+security:
+  - "/(security|vulnerability|cve)/i"
+
+question:
+  - "/[?]/"
+
+linting:
+  - "/(lint|lints|linting)/i"
+
+documentation:
+  - "/(doc|docs|documentation)/i"
+
+bug:
+  - "/bug/i"
