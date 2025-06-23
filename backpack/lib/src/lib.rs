@@ -9,7 +9,7 @@ use std::{collections::HashMap, error::Error};
 use tracing::Level;
 use which::which;
 
-/// List GitHub repos
+/// Automatically update all your forked repositories on Github
 #[derive(Parser)]
 #[clap(version)]
 pub struct Cli {
