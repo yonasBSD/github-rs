@@ -244,6 +244,22 @@ tasks:
     cmds:
       - task: run:sonarcube
 
+  audit:licenses:
+    desc: Look for incompatible licenses
+    cmds:
+      - task: run:feluda
+      - task: run:cargo-license
+
+  run:feluda:
+    desc: Run feluda
+    cmds:
+      - feluda
+
+  run:cargo-license:
+    desc: Run cargo-license
+    cmds:
+      - cargo license
+
   run:sonarcube:
     desc: Run sonarcube
     cmds:
