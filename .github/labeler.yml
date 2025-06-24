@@ -22,5 +22,8 @@ bug:
 testing:
   - "/(test|tests|testing)/i"
 
+feature:
+  - "/(feat|feature|features)/i"
+
 workflows:
   - "/(workflow|workflows|github action)/i"
