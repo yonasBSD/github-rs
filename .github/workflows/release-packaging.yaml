@@ -102,6 +102,10 @@ jobs:
             *.html
             *.sig
 
+      # Waiting on https://github.com/anchore/sbom-action/issues/117
+      - name: Prepare SBOM generator
+        run: rm -rf target
+
       - name: Upload SBOM
         uses: anchore/sbom-action@v0
 
