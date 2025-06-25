@@ -2,9 +2,9 @@
 
 use clap::Parser;
 use colored::Colorize;
-use octocrab::models::Repository;
 use octocrab::Octocrab;
-use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
+use octocrab::models::Repository;
+use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, error::Error};
 use tracing::Level;
 use which::which;
