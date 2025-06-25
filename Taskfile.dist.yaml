@@ -248,10 +248,11 @@ tasks:
       - task: run:sonarcube
 
   audit:licenses:
-    desc: Look for incompatible licenses
+    desc: Look for incompatible licenses and add SPDX headers
     cmds:
       - task: run:feluda
       - task: run:cargo-license
+      - task: run:reuse
 
   run:feluda:
     desc: Run feluda
@@ -262,6 +263,14 @@ tasks:
     desc: Run cargo-license
     cmds:
       - cargo license
+
+  run:reuse:
+    desc: Run reuse
+    cmds:
+      - uvx reuse annotate --copyright="yonasBSD" --license=MIT
+      - uvx reuse download --all
+      - uvx reuse lint
+      - uvx reuse spdx --creator-person "Yonas Yanfa" --creator-organization yonasBSD --add-license-concluded
 
   run:sonarcube:
     desc: Run sonarcube
