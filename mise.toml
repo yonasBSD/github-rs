@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2025 yonasBSD
+
+[tools]
+opentofu = "1"
+aws-cli = "2"
+
+[env]
+TF_WORKSPACE = "development"
+AWS_REGION = "us-west-2"
+AWS_PROFILE = "dev"
+
+[tasks.plan]
+description = "Run terraform plan with configured workspace"
+run = """
+terraform init
+terraform workspace select $TF_WORKSPACE
+terraform plan
+"""
+
+[tasks.validate]
+description = "Validate AWS credentials and terraform config"
+run = """
+aws sts get-caller-identity
+terraform validate
+"""
+
+[tasks.deploy]
+description = "Deploy infrastructure after validation"
+depends = ["validate", "plan"]
+run = "terraform apply -auto-approve"
