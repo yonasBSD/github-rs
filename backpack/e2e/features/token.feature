@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2025 yonasBSD
+
 Feature: List all GitHub repos.
 
   @eating

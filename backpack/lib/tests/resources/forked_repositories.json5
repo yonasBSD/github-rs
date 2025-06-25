@@ -1,13 +1,16 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2025 yonasBSD
+
 [
   {
-    "id": 983023742,
+    "id": "983023742",
     "node_id": "R_kgDOOpfAfg",
     "name": "firefox",
     "full_name": "yonasBSD/firefox",
     "private": false,
     "owner": {
       "login": "yonasBSD",
-      "id": 115436743,
+      "id": "115436743",
       "node_id": "O_kgDOBuFsxw",
       "avatar_url": "https://avatars.githubusercontent.com/u/115436743?v=4",
       "gravatar_id": "",
@@ -151,14 +154,14 @@
       "site_admin": false
     },
     "parent": {
-      "id": 835510315,
+      "id": "835510315",
       "node_id": "R_kgDOMczgKw",
       "name": "firefox",
       "full_name": "mozilla-firefox/firefox",
       "private": false,
       "owner": {
         "login": "mozilla-firefox",
-        "id": 148481591,
+        "id": "148481591",
         "node_id": "O_kgDOCNmmNw",
         "avatar_url": "https://avatars.githubusercontent.com/u/148481591?v=4",
         "gravatar_id": "",
@@ -260,14 +263,14 @@
       "default_branch": "main"
     },
     "source": {
-      "id": 835510315,
+      "id": "835510315",
       "node_id": "R_kgDOMczgKw",
       "name": "firefox",
       "full_name": "mozilla-firefox/firefox",
       "private": false,
       "owner": {
         "login": "mozilla-firefox",
-        "id": 148481591,
+        "id": "148481591",
         "node_id": "O_kgDOCNmmNw",
         "avatar_url": "https://avatars.githubusercontent.com/u/148481591?v=4",
         "gravatar_id": "",

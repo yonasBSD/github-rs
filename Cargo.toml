@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2025 yonasBSD
+
 [workspace]
 members = ["backpack/cli", "backpack/lib", "backpack/e2e", "xtask"]
 resolver = "2"

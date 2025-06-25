@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 yonasBSD
+
+SPDX-License-Identifier: MIT
+-->
+
 # Security Policy
 
 ## Reporting a Vulnerability

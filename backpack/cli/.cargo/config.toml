@@ -1,2 +1,5 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2025 yonasBSD
+
 [build]
 rustflags = ["--cfg", "tokio_unstable"]        # custom flags to pass to all compiler invocations

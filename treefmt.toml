@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 yonasBSD
+#
+# SPDX-License-Identifier: MIT
+
 [formatter.rustfmt]
 command = "rustfmt"
 excludes = []

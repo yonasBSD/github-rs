@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 yonasBSD
+#
+# SPDX-License-Identifier: MIT
+
 name: Scorecard Audit
 on:
   # For Branch-Protection check. Only the default branch is supported. See

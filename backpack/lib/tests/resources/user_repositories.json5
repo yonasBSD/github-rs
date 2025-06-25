@@ -1,13 +1,15 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2025 yonasBSD
 [
   {
-    "id": 566109822,
+    "id": "566109822",
     "node_id": "R_kgDOIb4mfg",
     "name": "actix-examples",
     "full_name": "iamjpotts/actix-examples",
     "private": false,
     "owner": {
       "login": "iamjpotts",
-      "id": 8704475,
+      "id": "8704475",
       "node_id": "MDQ6VXNlcjg3MDQ0NzU=",
       "avatar_url": "https://avatars.githubusercontent.com/u/8704475?v=4",
       "gravatar_id": "",
@@ -106,14 +108,14 @@
     "default_branch": "master"
   },
   {
-    "id": 292435601,
+    "id": "292435601",
     "node_id": "MDEwOlJlcG9zaXRvcnkyOTI0MzU2MDE=",
     "name": "amazon-sqs-java-temporary-queues-client",
     "full_name": "iamjpotts/amazon-sqs-java-temporary-queues-client",
     "private": false,
     "owner": {
       "login": "iamjpotts",
-      "id": 8704475,
+      "id": "8704475",
       "node_id": "MDQ6VXNlcjg3MDQ0NzU=",
       "avatar_url": "https://avatars.githubusercontent.com/u/8704475?v=4",
       "gravatar_id": "",
