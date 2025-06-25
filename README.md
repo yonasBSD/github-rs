@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 yonasBSD
+
+SPDX-License-Identifier: MIT
+-->
+
 # Rust CI with GitHub Actions
 
 ![Linting workflow](https://github.com/yonasBSD/github-rs/actions/workflows/lint.yaml/badge.svg)

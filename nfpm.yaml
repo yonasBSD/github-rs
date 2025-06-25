@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 yonasBSD
+#
+# SPDX-License-Identifier: MIT
+
 # nfpm example configuration file
 #
 # check https://nfpm.goreleaser.com/configuration for detailed usage

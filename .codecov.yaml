@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 yonasBSD
+#
+# SPDX-License-Identifier: MIT
+
 ignore:
   - "backpack/cli"
   - "backpack/e2e"

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2025 yonasBSD
+
 #![feature(coverage_attribute)]
 
 #[cfg(not(feature = "coverage"))]

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: 2025 yonasBSD
+
 #![allow(dead_code)]
 
 use clap::{AppSettings, Arg, Command};
