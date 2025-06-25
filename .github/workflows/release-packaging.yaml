@@ -102,8 +102,11 @@ jobs:
             *.html
             *.sig
 
+      # Waiting on https://github.com/anchore/sbom-action/issues/117
       - name: Upload SBOM
         uses: anchore/sbom-action@v0
+        env:
+          SYFT_EXCLUDE: ./target
 
     #- name: Output artifact ID
     #  run:  echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
