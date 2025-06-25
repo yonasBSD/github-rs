@@ -97,3 +97,25 @@ jobs:
 
       - name: Conventional commit check
         uses: cocogitto/cocogitto-action@main
+
+  licenses:
+    name: Licenses
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Setup Cache
+        uses: mozilla-actions/sccache-action@v0.0.9
+
+      - name: Check licenses
+        uses: yonasBSD/toolkit@main
+        with:
+          run: |
+            git config --global --add safe.directory /github/workspace
+            rustup default nightly
+            task audit:licenses
