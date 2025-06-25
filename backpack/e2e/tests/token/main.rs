@@ -1,4 +1,4 @@
-use cucumber::{given, then, when, World as _};
+use cucumber::{World as _, given, then, when};
 use github_rs_lib::get_repos;
 
 #[derive(Debug, Default, cucumber::World)]
