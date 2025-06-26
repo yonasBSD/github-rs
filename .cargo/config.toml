@@ -4,5 +4,13 @@
 [build]
 rustflags = ["--cfg", "tokio_unstable"]
 
+[profile.release]
+lto = "off"
+debug = "none"
+opt-level = 0
+
+[profile.release.package."*"]
+opt-level = 0
+
 [alias]
 xtask = "run --package xtask --"
