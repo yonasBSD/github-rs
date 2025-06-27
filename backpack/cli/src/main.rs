@@ -5,7 +5,7 @@
 
 #[cfg(not(feature = "coverage"))]
 use clap::Parser;
-use github_rs_lib::{Cli, get_repos, get_token, update_repos};
+use github_rs_lib::{Cli, Commands, doctor, get_repos, get_token, update_repos};
 use std::error::Error;
 use terminal_banner::Banner;
 use tracing_subscriber::{Registry, fmt, prelude::*};
@@ -71,24 +71,29 @@ async fn main() -> Result<(), Box<dyn Error>> {
         "Parsed command line arguments"
     );
 
-    if cli.sync {
-        tracing::warn!("Sync enabled. This might take a while.");
-    }
+    match &cli.command {
+        Some(Commands::Doctor {}) => doctor().await.expect("Run doctor"),
+        None => {
+            if cli.sync {
+                tracing::warn!("Sync enabled. This might take a while.");
+            }
 
-    let token = get_token(cli.token.unwrap_or_default()).await?;
-    tracing::trace!(token = token, "Got GitHub token");
+            let token = get_token(cli.token.unwrap_or_default()).await?;
+            tracing::trace!(token = token, "Got GitHub token");
 
-    // Get the value of the positional argument (if provided)
-    let repos = match cli.org {
-        Some(org) => get_repos(token.clone(), Some(org)).await?,
-        None => get_repos(token.clone(), None).await?,
-    };
+            // Get the value of the positional argument (if provided)
+            let repos = match cli.org {
+                Some(org) => get_repos(token.clone(), Some(org)).await?,
+                None => get_repos(token.clone(), None).await?,
+            };
 
-    let count = update_repos(repos, cli.sync, token.clone()).await?;
-    tracing::trace!(count = count, "Got count of GitHub repos updated");
+            let count = update_repos(repos, cli.sync, token.clone()).await?;
+            tracing::trace!(count = count, "Got count of GitHub repos updated");
 
-    if count > 0 {
-        println!("Total updates: {count}");
+            if count > 0 {
+                println!("Total updates: {count}");
+            }
+        }
     }
 
     Ok(())
