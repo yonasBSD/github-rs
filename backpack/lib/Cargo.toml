@@ -33,6 +33,14 @@ dns-lookup = "2.0.4"
 rdap_client = "0.2.0"
 taplo = { version = "0.14.0", features = ["schema", "schemars"] }
 uuid = { version = "1.17.0", features = ["v4"] }
+chrono-humanize = "0.2.3"
+termimad = "0.33.0"
+crossterm = "0.29.0"
+pluralizer = "0.5.0"
+minisign = "0.7.9"
+inquire = "0.7.5"
+domain-check-lib = "0.4.0"
+chrono = "0.4.41"
 
 [dev-dependencies]
 test-log = { version = "0.2.17", features = ["trace", "color"] }

@@ -28,7 +28,7 @@ fn main() -> Result<(), anyhow::Error> {
     let matches = cli.get_matches();
 
     let root = ops::root_dir();
-    let res = match matches.subcommand() {
+    match matches.subcommand() {
         Some(("coverage", sm)) => tasks::coverage(sm.is_present("dev")),
         Some(("vars", _)) => {
             println!("root: {root:?}");
@@ -40,6 +40,5 @@ fn main() -> Result<(), anyhow::Error> {
         Some(("bloat-deps", _)) => tasks::bloat_deps("backpack"),
         Some(("bloat-time", _)) => tasks::bloat_time("backpack"),
         _ => unreachable!("unreachable branch"),
-    };
-    res
+    }
 }

@@ -5,7 +5,7 @@
 
 #[cfg(not(feature = "coverage"))]
 use clap::Parser;
-use github_rs_lib::{Cli, Commands, doctor, get_repos, get_token, update_repos};
+use github_rs_lib::{Cli, Commands, about, doctor, get_repos, get_token, update_repos};
 use std::error::Error;
 use terminal_banner::Banner;
 use tracing_subscriber::{Registry, fmt, prelude::*};
@@ -73,6 +73,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     match &cli.command {
         Some(Commands::Doctor {}) => doctor().await.expect("Run doctor"),
+        Some(Commands::About {}) => about().await.expect("Run about"),
         None => {
             if cli.sync {
                 tracing::warn!("Sync enabled. This might take a while.");

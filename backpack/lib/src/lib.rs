@@ -6,13 +6,15 @@
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use config::Config;
-use octocrab::Octocrab;
-use octocrab::models::Repository;
+use octocrab::models::{Repository, repos::Release};
+use octocrab::{Octocrab, Page};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, error::Error, fmt, fs};
 use terminal_banner::{Banner, Text, TextAlign};
 use tracing::Level;
 use which::which;
+use chrono_humanize::HumanTime;
+
 
 /// Automatically update all your forked repositories on Github
 #[derive(Debug, Parser)]
@@ -35,19 +37,22 @@ pub struct Cli {
     /// Command
     #[command(subcommand)]
     pub command: Option<Commands>,
-    //Version(clap_vergen::Version),
 }
 
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Doctor diagnostics
     Doctor {},
+
+    /// About us
+    About {},
 }
 
 impl fmt::Display for Commands {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Commands::Doctor {} => write!(f, "Doctor command"),
+            Commands::About {} => write!(f, "About command"),
         }
     }
 }
@@ -55,6 +60,273 @@ impl fmt::Display for Commands {
 /// Multiplies two integers
 pub fn multiply(a: i32, b: i32) -> i32 {
     a * b
+}
+
+/// About
+pub async fn about() -> Result<(), Box<dyn Error>> {
+    let banner = Banner::new()
+        .text(Text::from("About").align(TextAlign::Center))
+        .render();
+    println!("{}", banner.cyan());
+    about_this();
+
+    let banner = Banner::new()
+        .text(Text::from("Contact").align(TextAlign::Center))
+        .render();
+    println!("{}", banner.cyan());
+    about_contact();
+
+    let banner = Banner::new()
+        .text(Text::from("Changelog").align(TextAlign::Center))
+        .render();
+    println!("{}", banner.cyan());
+    let _ = about_changelog();
+
+    let banner = Banner::new()
+        .text(Text::from("Releases").align(TextAlign::Center))
+        .render();
+    println!("{}", banner.cyan());
+    let _ = about_releases().await;
+
+    let banner = Banner::new()
+        .text(Text::from("Project Stats").align(TextAlign::Center))
+        .render();
+    println!("{}", banner.cyan());
+    about_project_stats();
+
+    Ok(())
+}
+
+/// About :: This
+pub fn about_this() {
+    println!(
+        "
+    github-rs can list and automatically update your forked repositories.
+
+    It's typically run as a cron job:
+
+    00 23 * * * github-rs --sync
+    "
+    );
+
+    let _ = print_markdown(include_str!("../../../README.md"));
+}
+
+/// About :: Contact information
+pub fn about_contact() {
+    println!("Fill an issue on GitHub: https://github.com/yonasBSD/github-rs/issue");
+    println!(
+        "If you found a security issue, please use this form: https://github.com/yonasBSD/github-rs/issue/security"
+    );
+    //about_enc_message();
+}
+
+fn get_text_input() -> String {
+    use inquire::{Text, validator::Validation};
+    let validator = |input: &str| {
+        if input.chars().count() < 100 {
+            Ok(Validation::Invalid(
+                "More than 100 characters is required.".into(),
+            ))
+        } else {
+            Ok(Validation::Valid)
+        }
+    };
+
+    let status = Text::new("Write your message")
+        .with_validator(validator)
+        .prompt();
+
+    match status {
+        Ok(ref _status) => println!("Sending your encrypted message to the security team."),
+        Err(ref err) => println!("Error while publishing your status: {}", err),
+    }
+
+    status.unwrap()
+}
+
+/// About :: Contact information :: Encrypted message
+fn about_enc_message() {
+    use minisign::{KeyPair, PublicKeyBox, SecretKeyBox, SignatureBox};
+    use std::io::Cursor;
+
+    // Generate and return a new key pair
+    // The key is encrypted using a password.
+    // If `None` is given, the password will be asked for interactively.
+    let KeyPair { pk, sk } =
+        KeyPair::generate_encrypted_keypair(Some("key password".to_string())).unwrap();
+
+    // In order to be stored to disk, keys have to be converted to "boxes".
+    // A box is just a container, with some metadata about its content.
+    // Boxes can be converted to/from strings, making them convenient to use for storage.
+    let pk_box_str = pk.to_box().unwrap().to_string();
+    let sk_box_str = sk
+        .to_box(None) // Optional comment about the key
+        .unwrap()
+        .to_string();
+
+    // `pk_box_str` and `sk_box_str` can now be saved to disk.
+    // This is a long-term key pair, that can be used to sign as many files as needed.
+    // For conveniency, the `KeyPair::generate_and_write_encrypted_keypair()` function
+    // is available: it generates a new key pair, and saves it to disk (or any `Writer`)
+    // before returning it.
+
+    // Assuming that `sk_box_str` is something we previously saved and just reloaded,
+    // it can be converted back to a secret key box:
+    let sk_box = SecretKeyBox::from_string(&sk_box_str).unwrap();
+
+    // and the box can be opened using the password to reveal the original secret key:
+    let sk = sk_box
+        .into_secret_key(Some("key password".to_string()))
+        .unwrap();
+
+    // Now, we can use the secret key to sign anything.
+    let data = get_text_input();
+    let data_reader = Cursor::new(data.clone());
+    let signature_box = minisign::sign(None, &sk, data_reader, None, None).unwrap();
+
+    // We have a signature! Let's inspect it a little bit.
+    println!(
+        "Untrusted comment: [{}]",
+        signature_box.untrusted_comment().unwrap()
+    );
+    println!(
+        "Trusted comment: [{}]",
+        signature_box.trusted_comment().unwrap()
+    );
+
+    // Converting the signature box to a string in order to save it is easy.
+    let signature_box_str = signature_box.into_string();
+
+    // Now, let's verify the signature.
+    // Assuming we just loaded it into `signature_box_str`, get the box back.
+    let signature_box = SignatureBox::from_string(&signature_box_str).unwrap();
+
+    // Load the public key from the string.
+    let pk_box = PublicKeyBox::from_string(&pk_box_str).unwrap();
+    let pk = pk_box.into_public_key().unwrap();
+
+    // And verify the data.
+    let data_reader = Cursor::new(data);
+    let verified = minisign::verify(&pk, &signature_box, data_reader, true, false, false);
+    match verified {
+        Ok(()) => println!("Success!"),
+        Err(_) => println!("Verification failed"),
+    };
+}
+
+fn strip_html(source: &str) -> String {
+    let mut data = String::new();
+    let mut inside = false;
+
+    // Step 1: loop over string chars.
+    for c in source.chars() {
+        // Step 2: detect markup start and end, and skip over markup chars.
+        if c == '<' {
+            inside = true;
+            continue;
+        }
+        if c == '>' {
+            inside = false;
+            continue;
+        }
+        if !inside {
+            // Step 3: push other characters to the result string.
+            data.push(c);
+        }
+    }
+
+    // Step 4: return string.
+    data
+}
+
+/// Print markdown
+fn print_markdown(markdown: &str) -> Result<(), Box<dyn Error>> {
+    use crossterm::style::{Attribute, Color};
+    use termimad::{Alignment, MadSkin}; // For custom styling
+
+    let mut skin = MadSkin::default();
+    skin.set_headers_fg(Color::Rgb {
+        r: 255,
+        g: 165,
+        b: 0,
+    }); // Orange headers
+    skin.bold.add_attr(Attribute::Underlined); // Bold text also underlined
+    skin.italic.set_fg(Color::Cyan); // Italic text in Cyan
+    skin.code_block.set_bg(Color::DarkGrey); // Code blocks with dark grey background
+    //skin.quote_mark = CompoundStyle::new(Some(Color::Magenta), None, Attribute::Bold.into()); // Quote mark in bold magenta
+    //skin.quote_line = CompoundStyle::new(Some(Color::DarkYellow), None, Attribute::Italic.into()); // Quoted text in italic dark yellow
+    skin.table.align = Alignment::Center; // Center align table content
+
+    // Render with custom skin
+    let changelog = strip_html(markdown);
+    skin.print_text(&changelog);
+
+    Ok(())
+}
+
+/// About :: Changelog
+pub fn about_changelog() -> Result<(), Box<dyn Error>> {
+    let _ = print_markdown(include_str!("../../../CHANGELOG.md"));
+    Ok(())
+}
+
+/// About :: Releases
+pub async fn about_releases() -> Result<(), Box<dyn Error>> {
+    let owner = "yonasBSD";
+    let repo = "github-rs";
+    let token = get_token(String::new()).await?;
+
+    println!("\nFetching releases for {owner}/{repo}...");
+
+    let octocrab = Octocrab::builder().personal_token(token).build()?;
+    let mut all_releases: Vec<Release> = Vec::new();
+    let page: Page<Release> = octocrab
+        .repos(owner, repo)
+        .releases()
+        .list()
+        .per_page(100) // Adjust per_page as needed (max 100)
+        .send()
+        .await?;
+
+    all_releases.extend(page.items.into_iter());
+
+    if all_releases.is_empty() {
+        println!("No releases found for {owner}/{repo}");
+    } else {
+        use pluralizer::pluralize;
+        println!(
+            "\nFound {}:",
+            pluralize("release", all_releases.len().try_into().unwrap(), true)
+        );
+
+        for release in all_releases {
+            if !release.prerelease && !release.draft {
+                println!(
+                    "  - Name: {}",
+                    release.name.unwrap_or_else(|| "N/A".to_string())
+                );
+                println!("    Tag: {}", release.tag_name);
+                println!(
+                    "    Published At: {}",
+                    HumanTime::from(release.published_at.unwrap())
+                );
+                println!("    URL: {}", release.html_url);
+                println!("    --");
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// About :: Project stats
+pub fn about_project_stats() {
+    // TODO:
+    // - Stars
+    // - Forks
+    // - Contributors
+    // - Commits
 }
 
 /// Doctor build information
@@ -103,6 +375,8 @@ pub fn doctor_config() -> Result<(), Box<dyn Error>> {
         .get_config_home()
         .unwrap();
 
+    //Some(true) => println!("✅ {} is available", result.domain),
+    //Some(false) => println!("❌ {} is taken", result.domain),
     println!(
         "{}: {}",
         "✓ found XDG config path".green(),
@@ -127,15 +401,15 @@ pub fn doctor_config() -> Result<(), Box<dyn Error>> {
         println!(
             "{}: {}",
             "✓ found valid TOML config file at".green(),
-            format!("{}/{}", config_path.display(), "config.toml")
+            format!("{}{}", config_path.display(), "config.toml")
                 .as_str()
                 .purple(),
         );
     } else {
         println!(
             "{}: {}",
-            "[ ! ] invalid TOML file at".red(),
-            format!("{}/{}", config_path.display(), "config.toml")
+            "❌ invalid TOML file at".red(),
+            format!("{}{}", config_path.display(), "config.toml")
                 .as_str()
                 .purple(),
         );
@@ -150,7 +424,7 @@ pub fn doctor_token() -> String {
         .get_config_home()
         .unwrap();
 
-    let token = match Config::builder()
+    match Config::builder()
         // ~/.config/github-rs/config.toml
         .add_source(config::File::with_name(
             format!("{}/{}", config_path.display(), "config").as_str(),
@@ -186,13 +460,11 @@ pub fn doctor_token() -> String {
             eprintln!("{}", "[ ! ] Error: Could not find GitHub token".red());
             String::from("")
         }
-    };
-
-    token
+    }
 }
 
 /// Doctor network
-pub async fn doctor_network() {
+pub async fn doctor_network() -> Result<(), Box<dyn Error>> {
     println!("{}", "\n# Network\n".yellow());
 
     use dns_lookup::lookup_host;
@@ -216,13 +488,37 @@ pub async fn doctor_network() {
         );
     }
 
+    use domain_check_lib::{DomainChecker, CheckConfig};
+
+    let config = CheckConfig::default()
+        .with_concurrency(20)
+        .with_detailed_info(true);
+
+    let checker = DomainChecker::with_config(config);
+    let result = checker.check_domain(hostname).await?;
+
+    match result.available {
+        Some(true) => println!("{} {}", result.domain.red(), "is not registered".red()),
+        Some(false) => {
+            if let Some(info) = result.info {
+                let creation_date: chrono::DateTime<chrono::Utc> = info.creation_date.expect("Get registration date").parse().unwrap();
+                let created_ago = format!("{}", HumanTime::from(creation_date));
+
+                println!("{} {} {}", "✓".green(), result.domain.purple(), "is registered".green());
+                println!("{} {}", "✓ Registrar:".green(), info.registrar.unwrap().purple());
+                println!("{} {}", "✓ Created:".green(), created_ago.purple());
+            }
+        },
+        None => println!("{}{}", result.domain.red(), "status is UNKNOWN".red()),
+    }
+
     use rdap_client::Client;
 
     let client = Client::new();
     // Fetch boostrap from IANA.
     let bootstrap = client.fetch_bootstrap().await.unwrap();
     // Find what RDAP server to use for given domain.
-    if let Some(servers) = bootstrap.dns.find(&hostname) {
+    if let Some(servers) = bootstrap.dns.find(hostname) {
         let response = client.query_domain(&servers[0], hostname).await.unwrap();
         println!(
             "{} {}: {}",
@@ -231,6 +527,8 @@ pub async fn doctor_network() {
             response.handle.expect("Bad response").to_string().purple()
         );
     }
+
+    Ok(())
 }
 
 /// Doctor security
@@ -288,8 +586,8 @@ pub async fn doctor() -> Result<(), Box<dyn Error>> {
     doctor_build();
     let _ = doctor_config();
     let token = doctor_token();
-    doctor_network().await;
-    let _ = doctor_security(token);
+    let _ = doctor_network().await;
+    let _ = doctor_security(token).await;
 
     Ok(())
 }
