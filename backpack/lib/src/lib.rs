@@ -3,18 +3,22 @@
 
 #![feature(coverage_attribute)]
 
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use colored::Colorize;
+use config::Config;
 use octocrab::Octocrab;
 use octocrab::models::Repository;
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue, USER_AGENT};
-use std::{collections::HashMap, error::Error};
+use std::{collections::HashMap, error::Error, fmt, fs};
+use terminal_banner::{Banner, Text, TextAlign};
 use tracing::Level;
 use which::which;
 
 /// Automatically update all your forked repositories on Github
-#[derive(Parser)]
+#[derive(Debug, Parser)]
 #[clap(version)]
+#[command(author, version, about, long_about = None)]
+#[command(propagate_version = true)]
 pub struct Cli {
     /// The organization
     #[arg(index = 1)]
@@ -27,11 +31,267 @@ pub struct Cli {
     /// GitHub token
     #[arg(short = 't', long = "token")]
     pub token: Option<String>,
+
+    /// Command
+    #[command(subcommand)]
+    pub command: Option<Commands>,
+    //Version(clap_vergen::Version),
+}
+
+#[derive(Debug, Subcommand)]
+pub enum Commands {
+    /// Doctor diagnostics
+    Doctor {},
+}
+
+impl fmt::Display for Commands {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Commands::Doctor {} => write!(f, "Doctor command"),
+        }
+    }
 }
 
 /// Multiplies two integers
 pub fn multiply(a: i32, b: i32) -> i32 {
     a * b
+}
+
+/// Doctor build information
+pub fn doctor_build() {
+    println!("{}", "# Build Information\n".yellow());
+    const VERSION: &str = env!("CARGO_PKG_VERSION");
+    const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+    const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
+    const HOMEPAGE: &str = env!("CARGO_PKG_HOMEPAGE");
+    const REPOSITORY: &str = env!("CARGO_PKG_REPOSITORY");
+
+    use uuid::Uuid;
+    let uuid = Uuid::new_v4();
+
+    println!("{}: {}", "Version".green(), VERSION.purple());
+    println!("{}: {}", "Build ID".green(), uuid.to_string().purple());
+    println!(
+        "{}: {}",
+        "Build Date".green(),
+        env!("VERGEN_RUSTC_COMMIT_DATE").to_string().purple()
+    );
+    println!(
+        "{} {}{} {}{} {}{} {}{}",
+        "Built from".green(),
+        "branch=".green(),
+        env!("GIT_BRANCH").purple(),
+        "commit=".green(),
+        env!("GIT_COMMIT").purple(),
+        "dirty=".green(),
+        env!("GIT_DIRTY").purple(),
+        "source_timestamp=".green(),
+        env!("SOURCE_TIMESTAMP").purple()
+    );
+
+    println!("{}: {}", "Authors".green(), AUTHORS.purple());
+    println!("{}: {}", "Description".green(), DESCRIPTION.purple());
+    println!("{}: {}", "Homepage".green(), HOMEPAGE.purple());
+    println!("{}: {}", "Repositories".green(), REPOSITORY.purple());
+}
+
+/// Doctor config
+pub fn doctor_config() -> Result<(), Box<dyn Error>> {
+    println!("{}", "\n# Config\n".yellow());
+
+    let xdg_path = xdg::BaseDirectories::with_prefix("")
+        .get_config_home()
+        .unwrap();
+
+    println!(
+        "{}: {}",
+        "✓ found XDG config path".green(),
+        xdg_path.to_str().unwrap().purple()
+    );
+
+    let config_path = xdg::BaseDirectories::with_prefix("github-rs")
+        .get_config_home()
+        .unwrap();
+
+    println!(
+        "{}: {}",
+        "✓ found github-rs config path".green(),
+        config_path.to_str().unwrap().purple()
+    );
+
+    let file: String =
+        fs::read_to_string(format!("{}/{}", config_path.display(), "config.toml").as_str())?;
+    let parse_result = taplo::parser::parse(&file);
+
+    if parse_result.errors.is_empty() {
+        println!(
+            "{}: {}",
+            "✓ found valid TOML config file at".green(),
+            format!("{}/{}", config_path.display(), "config.toml")
+                .as_str()
+                .purple(),
+        );
+    } else {
+        println!(
+            "{}: {}",
+            "[ ! ] invalid TOML file at".red(),
+            format!("{}/{}", config_path.display(), "config.toml")
+                .as_str()
+                .purple(),
+        );
+    }
+
+    Ok(())
+}
+
+/// Doctor token
+pub fn doctor_token() -> String {
+    let config_path = xdg::BaseDirectories::with_prefix("github-rs")
+        .get_config_home()
+        .unwrap();
+
+    let token = match Config::builder()
+        // ~/.config/github-rs/config.toml
+        .add_source(config::File::with_name(
+            format!("{}/{}", config_path.display(), "config").as_str(),
+        ))
+        // env variables
+        .add_source(config::Environment::with_prefix("GITHUB"))
+        .build()
+    {
+        Ok(settings) => {
+            println!("{}", "\n# Token\n".yellow());
+
+            // Read config file
+            let app = settings
+                .try_deserialize::<HashMap<String, String>>()
+                .unwrap();
+
+            if app.contains_key("token") {
+                println!(
+                    "{}: {}",
+                    "✓ found GitHub token".green(),
+                    app["token"].clone().purple()
+                );
+                app["token"].clone()
+            } else {
+                println!("{}", "\n# Token\n".yellow());
+                eprintln!("{}", "[ ! ] could not find GitHub token".red());
+                String::from("")
+            }
+        }
+
+        Err(_) => {
+            println!("{}", "\n# Token\n".yellow());
+            eprintln!("{}", "[ ! ] Error: Could not find GitHub token".red());
+            String::from("")
+        }
+    };
+
+    token
+}
+
+/// Doctor network
+pub async fn doctor_network() {
+    println!("{}", "\n# Network\n".yellow());
+
+    use dns_lookup::lookup_host;
+
+    let hostname = "github.com";
+    let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap();
+    if !ips.is_empty() {
+        for ip in ips {
+            println!(
+                "{} {}: {}",
+                "✓ found IP address for".green(),
+                hostname.green(),
+                ip.to_string().purple()
+            );
+        }
+    } else {
+        println!(
+            "{} {}",
+            "[ ! ] Unable to find IP address for".red(),
+            hostname.red()
+        );
+    }
+
+    use rdap_client::Client;
+
+    let client = Client::new();
+    // Fetch boostrap from IANA.
+    let bootstrap = client.fetch_bootstrap().await.unwrap();
+    // Find what RDAP server to use for given domain.
+    if let Some(servers) = bootstrap.dns.find(&hostname) {
+        let response = client.query_domain(&servers[0], hostname).await.unwrap();
+        println!(
+            "{} {}: {}",
+            "✓ found domain registration for".green(),
+            hostname.green(),
+            response.handle.expect("Bad response").to_string().purple()
+        );
+    }
+}
+
+/// Doctor security
+pub async fn doctor_security(token: String) -> Result<(), Box<dyn Error>> {
+    println!("{}", "\n# Security\n".yellow());
+    let octocrab = Octocrab::builder().personal_token(token.clone()).build()?;
+    let user = octocrab.current().user().await?;
+
+    if !token.is_empty() {
+        if !user.login.is_empty() {
+            println!("{}", "✓ found correct permissions on GitHub token".green());
+        } else {
+            println!("{}", "[ ! ] invalid permissions on GitHub token".red());
+        }
+    }
+
+    Ok(())
+}
+
+/// Doctor diagnostics
+pub async fn doctor() -> Result<(), Box<dyn Error>> {
+    tracing::event!(Level::TRACE, "Calling doctor()");
+    let banner = Banner::new()
+        .text(Text::from("Doctor Diagnostics").align(TextAlign::Center))
+        .render();
+    println!("{}", banner.cyan());
+    println!(
+        "{}",
+        "
+    // 1. Build Information
+    // 1.1 version
+    // 1.2 build id
+    // 1.3 build date
+    //
+    // 2. Config
+    // 2.1 XDG Config directory exists
+    // 2.2 github-rs config directory exists
+    // 2.3 github-rs config file exists
+    //
+    // 3. Tokens
+    // 3.1 GITHUB_TOKEN env variable exists
+    // 3.2 token found in config file
+    /
+    // 4. Network
+    // 4.1 github.com is registered (DNS)
+    // 4.1 github.com is resolvable (DNS)
+    // 4.2 GitHub API is operational (API)
+    //
+    // 5. Security
+    // 5.1 GitHub token is valid
+    "
+        .cyan()
+    );
+
+    doctor_build();
+    let _ = doctor_config();
+    let token = doctor_token();
+    doctor_network().await;
+    let _ = doctor_security(token);
+
+    Ok(())
 }
 
 /// List GitHub repositories
@@ -129,14 +389,14 @@ pub async fn get_token(token: String) -> Result<String, Box<dyn Error>> {
                 app["token"].clone()
             } else {
                 tracing::error!("could not find GitHub token");
-                println!("{}", "Error: Could not find GitHub token".red());
+                println!("{}", "[ ! ] Error: Could not find GitHub token".red());
                 std::process::exit(1)
             }
         }
 
         Err(_) => {
             tracing::error!("could not find GitHub token");
-            println!("{}", "Error: Could not find GitHub token".red());
+            println!("{}", "[ ! ] Error: Could not find GitHub token".red());
             std::process::exit(1);
         }
     };

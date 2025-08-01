@@ -27,6 +27,9 @@ coverage = []
 [dev-dependencies]
 test-log = { version = "0.2.17", features = ["trace", "color"] }
 
+[build-dependencies]
+vergen = { version = "9.0.6", features = ["time", "cargo", "build", "rustc", "si"] }
+
 [package.metadata.binstall.signing]
 algorithm = "minisign"
 pubkey = "RWS6/A1iiYtBjU101ofgB5ZBUq+erhj0pAF06delVbHPUiDee7PQvIML"

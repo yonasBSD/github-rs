@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2025 yonasBSD
+#
+# SPDX-License-Identifier: MIT
+
+default: build
+
+@build:
+  clear
+  cargo build --release --package github-rs && ../target/release/github-rs doctor
