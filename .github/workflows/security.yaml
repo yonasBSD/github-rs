@@ -101,7 +101,7 @@ jobs:
           toolchain: stable
 
       - name: Run advisories checklist
-        uses: EmbarkStudios/cargo-deny-action@30f817c6f72275c6d54dc744fbca09ebc958599f # v2
+        uses: EmbarkStudios/cargo-deny-action@f2ba7abc2abebaf185c833c3961145a3c275caad # v2
         with:
           command: check advisories
 
@@ -136,6 +136,6 @@ jobs:
           toolchain: stable
 
       - name: Run bans, licenses, and sources checklist
-        uses: EmbarkStudios/cargo-deny-action@30f817c6f72275c6d54dc744fbca09ebc958599f # v2
+        uses: EmbarkStudios/cargo-deny-action@f2ba7abc2abebaf185c833c3961145a3c275caad # v2
         with:
           command: check bans licenses sources
