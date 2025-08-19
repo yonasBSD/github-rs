@@ -276,3 +276,12 @@ tasks:
     desc: Run sonarcube
     cmds:
       - echo sonarcube run
+
+  deploy:
+    desc: Deploy to infrastructure
+    deps: ["run:terraform"]
+
+  run:terraform:
+    desc: Run terraform
+    cmds:
+      - mise run deploy
