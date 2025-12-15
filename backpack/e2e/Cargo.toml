@@ -10,7 +10,7 @@ repository = "https://github.com/yonasBSD/github-rs"
 
 [dev-dependencies]
 github-rs-lib = { package = "github-rs-lib", path = "../lib" }
-cucumber = { version = "0.21.1", features = ["libtest", "output-json", "output-junit", "timestamps", "tracing"] }
+cucumber = { version = "0.22.0", features = ["libtest", "output-json", "output-junit", "timestamps", "tracing"] }
 tokio = { version = "1.45.1", features = ["full", "macros"] }
 
 [[test]]
