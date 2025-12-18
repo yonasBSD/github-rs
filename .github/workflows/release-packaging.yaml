@@ -11,6 +11,8 @@ name: Release Packaging
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -107,6 +109,19 @@ jobs:
         uses: anchore/sbom-action@v0
         env:
           SYFT_EXCLUDE: ./target
+
+      - name: Upload Provenance Attestations
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: |
+            ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst
+            *.deb
+            *.apk
+            *.ipk
+            *.rpm
+            *.zst
+            *.html
+            *.sig
 
     #- name: Output artifact ID
     #  run:  echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
