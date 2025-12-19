@@ -36,14 +36,12 @@ jobs:
         uses: yonasBSD/toolkit@main
         with:
           run: |
-            rustup default nightly
             cargo auditable build --release --package github-rs
 
       - name: About Licenses
         uses: yonasBSD/toolkit@main
         with:
           run: |
-            rustup default nightly
             cargo about init
             cargo about generate about.hbs --output-file licenses.html
 
