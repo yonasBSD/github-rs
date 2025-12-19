@@ -34,7 +34,7 @@ SPDX-License-Identifier: MIT
 
 1. [Workflows](#workflows)
    - [Check and Lint (check-and-lint.yaml)](#check-and-lint)
-   - [Test with Code Coverage (test.yaml)](#test-with-code-coverage)
+   - [Test with Code Coverage (test-with-coverage.yaml)](#test-with-code-coverage)
    - [Release Packaging (release-packaging.yaml)](#release-packaging)
 2. [How to Use](#how-to-use)
 
@@ -76,7 +76,7 @@ You can add a `clippy.toml` or `.clippy.toml` to configure the style.
 - The action outputs result (**Clippy Output** added to a random workflow), and
 - For pull requests, it adds annotations on the diff.
 
-### Test with Code Coverage (test.yaml)
+### Test with Code Coverage (test-with-coverage.yaml)
 
 This workflow run tests, outputs test results, publishes code coverage results on [CodeCov](https://codecov.io/).
 Publishing test results and code coverage data is in one job to avoid running the tests twice.
