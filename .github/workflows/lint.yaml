@@ -120,6 +120,4 @@ jobs:
         uses: yonasBSD/toolkit@main
         with:
           run: |
-            git config --global --add safe.directory /github/workspace
-            rustup default nightly
             task audit:licenses
