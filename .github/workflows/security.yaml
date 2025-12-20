@@ -58,11 +58,9 @@ jobs:
           #curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
           export trivy_ver=$(curl -sL https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r ".tag_name" | cut -d'v' -f2)
           wget "https://github.com/aquasecurity/trivy/releases/download/v${trivy_ver}/trivy_${trivy_ver}_Linux-64bit.deb"
-          wget "https://github.com/aquasecurity/trivy/releases/download/v${trivy_ver}/trivy_${trivy_ver}_Linux-64bit.deb.pem"
-          wget "https://github.com/aquasecurity/trivy/releases/download/v${trivy_ver}/trivy_${trivy_ver}_Linux-64bit.deb.sig"
+          wget "https://github.com/aquasecurity/trivy/releases/download/v${trivy_ver}/trivy_${trivy_ver}_Linux-64bit.deb.sigstore.json"
           cosign verify-blob trivy_${trivy_ver}_Linux-64bit.deb \
-            --certificate trivy_${trivy_ver}_Linux-64bit.deb.pem \
-            --signature trivy_${trivy_ver}_Linux-64bit.deb.sig \
+            --bundle trivy_${trivy_ver}_Linux-64bit.deb.sigstore.json \
             --certificate-identity-regexp 'https://github\.com/aquasecurity/trivy/\.github/workflows/.+' \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
           sudo dpkg -i trivy_${trivy_ver}_Linux-64bit.deb
@@ -101,7 +99,7 @@ jobs:
           toolchain: stable
 
       - name: Run advisories checklist
-        uses: EmbarkStudios/cargo-deny-action@f2ba7abc2abebaf185c833c3961145a3c275caad # v2
+        uses: EmbarkStudios/cargo-deny-action@76cd80eb775d7bbbd2d80292136d74d39e1b4918 # v2
         with:
           command: check advisories
 
@@ -136,6 +134,6 @@ jobs:
           toolchain: stable
 
       - name: Run bans, licenses, and sources checklist
-        uses: EmbarkStudios/cargo-deny-action@f2ba7abc2abebaf185c833c3961145a3c275caad # v2
+        uses: EmbarkStudios/cargo-deny-action@76cd80eb775d7bbbd2d80292136d74d39e1b4918 # v2
         with:
           command: check bans licenses sources

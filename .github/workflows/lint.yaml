@@ -89,18 +89,29 @@ jobs:
           name: Clippy Output
 
   conventional_commits:
-    name: Conventional Commit Compliance
     runs-on: ubuntu-latest
+    name: Conventional Commit Compliance
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      # Checkout for pull_request events — use PR HEAD SHA
+      - name: Checkout PR HEAD
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # Checkout for push events — normal behavior
+      - name: Checkout default ref
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Conventional commit check
-        uses: cocogitto/cocogitto-action@main
+        uses: cocogitto/cocogitto-action@v4
+        with:
+          command: check
 
   licenses:
     name: Licenses
