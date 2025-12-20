@@ -12,14 +12,18 @@ env:
 dotenv: [".env", "{{ .taskEnv }}"]
 
 vars:
-  project: Hello World
-  homepage: https://example.com
+  project: github-rs
+  owner: yonasBSD
+  homepage: https://github.com/yonasBSD/github-rs
   forums: https://example.com/forums
   chat: https://chat.example.com
   ircserver: irc.libera.chat
   ircroom: help
-  author: Acme Inc.
-  version: 0.0.1
+  author: Yonas Yanfa
+  version:
+    sh: |
+      git fetch --tags --force >/dev/null 2>&1
+      git tag -l --sort=-v:refname | head -n 1 || echo "0.0.0"
   build:
     sh: git rev-parse --short HEAD
   date:
@@ -267,10 +271,10 @@ tasks:
   run:reuse:
     desc: Run reuse
     cmds:
-      - uvx reuse annotate --copyright="yonasBSD" --license=MIT
+      - uvx reuse annotate --copyright="{{ .owner }}" --license={{ .license }}
       - uvx reuse download --all
       - uvx reuse lint
-      - uvx reuse spdx --creator-person "Yonas Yanfa" --creator-organization yonasBSD --add-license-concluded
+      - uvx reuse spdx --creator-person "{{ .author }}" --creator-organization {{ .owner }} --add-license-concluded
 
   run:sonarcube:
     desc: Run sonarcube
