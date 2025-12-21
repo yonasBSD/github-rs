@@ -48,24 +48,18 @@ jobs:
       - name: Setup Cache
         uses: mozilla-actions/sccache-action@v0.0.9
 
-      - name: Install Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+      - name: Rust Format
+        uses: yonasBSD/toolkit@main
         with:
-          components: rustfmt
+          run: |
+            cargo fmt --version
+            cargo fmt --all --check
 
-      - name: Install Tree Format (treefmt)
-        run: |
-          curl -s https://api.github.com/repos/numtide/treefmt/tags | jq -r '.[0].name' > .ver
-          curl -sSLo treefmt.tgz https://github.com/numtide/treefmt/releases/download/$(cat .ver)/treefmt_$(cat .ver | cut -d'v' -f2)_linux_amd64.tar.gz
-          tar -xvf treefmt.tgz
-
-      - name: Rust Format (rustfmt)
-        run: |
-          cargo fmt --version
-          cargo fmt --all --check
-
-      - name: Tree Format (treefmt)
-        run: ./treefmt
+      - name: Tree Format
+        uses: yonasBSD/toolkit@main
+        with:
+          run: |
+            treefmt
 
   clippy:
     name: Clippy
