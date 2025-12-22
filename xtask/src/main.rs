@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: 2025 yonasBSD
 
-#![allow(dead_code)]
-
-use clap::{AppSettings, Arg, Command};
+use clap::{Arg, Command};
 use xtaskops::ops;
 use xtaskops::tasks;
 
 fn main() -> Result<(), anyhow::Error> {
     let cli = Command::new("xtask")
-        .setting(AppSettings::SubcommandRequiredElseHelp)
+        .subcommand_required(true)
+        .arg_required_else_help(true)
         .subcommand(
             Command::new("coverage").arg(
                 Arg::new("dev")
                     .short('d')
                     .long("dev")
                     .help("generate an html report")
-                    .takes_value(false),
+                    .action(clap::ArgAction::SetTrue),
             ),
         )
         .subcommand(Command::new("vars"))
@@ -25,11 +24,15 @@ fn main() -> Result<(), anyhow::Error> {
         .subcommand(Command::new("bloat-deps"))
         .subcommand(Command::new("bloat-time"))
         .subcommand(Command::new("docs"));
+
     let matches = cli.get_matches();
 
     let root = ops::root_dir();
     let res = match matches.subcommand() {
-        Some(("coverage", sm)) => tasks::coverage(sm.is_present("dev")),
+        Some(("coverage", sm)) => {
+            let dev = sm.get_flag("dev");
+            tasks::coverage(dev)
+        }
         Some(("vars", _)) => {
             println!("root: {root:?}");
             Ok(())
@@ -41,5 +44,6 @@ fn main() -> Result<(), anyhow::Error> {
         Some(("bloat-time", _)) => tasks::bloat_time("backpack"),
         _ => unreachable!("unreachable branch"),
     };
+
     res
 }

@@ -10,10 +10,10 @@ repository = "https://github.com/yonasBSD/github-rs"
 
 [dependencies]
 github-rs-lib = { package = "github-rs-lib", path = "../lib" }
-tokio = { version = "1.45.1", features = ["full", "macros"] }
+tokio = { version = "1.48.0", features = ["full", "macros"] }
 clap = { version = "*", features = ["derive"] }
-tracing = { version = "0.1.41", features = ["log"] }
-tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
+tracing = { version = "0.1.44", features = ["log"] }
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
 terminal-banner = { version = "0.4.1", features = ["color"] }
 console-subscriber = "0.5.0"
 
@@ -25,7 +25,7 @@ path = "src/main.rs"
 coverage = []
 
 [dev-dependencies]
-test-log = { version = "0.2.17", features = ["trace", "color"] }
+test-log = { version = "0.2.19", features = ["trace", "color"] }
 
 [package.metadata.binstall.signing]
 algorithm = "minisign"
