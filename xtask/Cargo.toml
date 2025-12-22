@@ -11,7 +11,7 @@ license = "MIT"
 
 [dependencies]
 
-clap = "3"
+clap = "4"
 anyhow = "1"
 xshell = "^0.2.7"
 duct = "1.1.1"
