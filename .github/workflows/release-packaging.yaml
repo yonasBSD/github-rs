@@ -75,7 +75,7 @@ jobs:
             rsign sign -W -s signing.key -x ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst.sig ${{ env.PROJECT_NAME_UNDERSCORE }}_${{ env.PROJECT_TARGET }}.tzst
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         id: artifact-upload-step
         with:
           name: ${{ env.PROJECT_NAME_UNDERSCORE }}
