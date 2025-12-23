@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: 2025 yonasBSD
 
-#![feature(coverage_attribute)]
-
 use clap::Parser;
 use colored::Colorize;
-use octocrab::Octocrab;
 use octocrab::models::Repository;
-use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue, USER_AGENT};
+use octocrab::Octocrab;
+use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use std::{collections::HashMap, error::Error};
 use tracing::Level;
 use which::which;

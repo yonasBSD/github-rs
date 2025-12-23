@@ -1,14 +1,11 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: 2025 yonasBSD
 
-#![feature(coverage_attribute)]
-
-#[cfg(not(feature = "coverage"))]
 use clap::Parser;
-use github_rs_lib::{Cli, get_repos, get_token, update_repos};
+use github_rs_lib::{get_repos, get_token, update_repos, Cli};
 use std::error::Error;
 use terminal_banner::Banner;
-use tracing_subscriber::{Registry, fmt, prelude::*};
+use tracing_subscriber::{fmt, prelude::*, Registry};
 
 #[cfg(not(feature = "coverage"))]
 #[tokio::main]
