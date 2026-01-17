@@ -24,7 +24,7 @@ colored = "3.0.0"
 which = "8.0.0"
 config = "0.15.19"
 xdg = "3.0.0"
-reqwest = { version = "0.12.27", default-features = false, features = ["blocking", "hickory-dns", "json", "rustls-tls"] }
+reqwest = { version = "0.13.1", default-features = false, features = ["blocking", "hickory-dns", "json", "rustls-tls"] }
 env_logger = "0.11.8"
 serde_json5 = "0.2.1"
 
